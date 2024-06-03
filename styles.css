@@ -8,10 +8,6 @@ body {
     background-color: #f9f9f9;
 }
 
-h1, h2, h3, h4, h5 {
-    font-family: 'Roboto Slab', serif;
-}
-
 .container {
     width: 80%;
     margin: auto;
