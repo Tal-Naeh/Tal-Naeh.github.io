@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Personal Blog</title>
+    <!-- Add the Google Fonts link here -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,7 +13,7 @@
         <div class="container">
             <h1>My Personal Blog</h1>
             <nav>
-                <ul>    
+                <ul>
                     <li><a href="#home">Home</a></li>
                     <li><a href="#about">About</a></li>
                     <li><a href="#blog">Blog</a></li>
@@ -32,7 +34,7 @@
         <section id="about">
             <div class="container">
                 <h2>About Me</h2>
-                <p>Hi, I'm Tal, a DevOps Engineer passionate about technology and coding.</p>
+                <p>Hi, I'm Tal, a computer science student passionate about technology and coding.</p>
             </div>
         </section>
 
@@ -49,6 +51,39 @@
                     <p class="post-meta">Posted on May 25, 2024 by Tal</p>
                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
                 </article>
+                <article>
+                    <h3><a href="#">Understanding Jenkins: Simplifying the Complexities</a></h3>
+                    <p class="post-meta">Posted on June 3, 2024 by Tal</p>
+                    <p>When I first encountered Jenkins, I found myself baffled by the intricate processes happening under the hood. The documentation and community resources were helpful, but I needed a more simplified explanation to truly grasp the concepts. So, I decided to dive deep and break it down into simpler terms for everyone else who might be feeling the same way.</p>
+                    <h4>What is Jenkins?</h4>
+                    <p>At its core, Jenkins is an open-source automation server. It helps automate parts of the software development process related to building, testing, and deploying, facilitating continuous integration and continuous delivery (CI/CD). But what does this really mean?</p>
+                    <h4>Breaking it Down</h4>
+                    <h5>1. Continuous Integration (CI):</h5>
+                    <p>Continuous Integration is a development practice where developers integrate code into a shared repository frequently. Jenkins automates the testing of these integrations to detect errors quickly.</p>
+                    <p><strong>Simple Version:</strong> Think of it as a vigilant code checker that ensures any new code added to the project doesn't break anything.</p>
+                    <h5>2. Continuous Delivery (CD):</h5>
+                    <p>Continuous Delivery extends CI by automatically deploying all code changes to a testing or production environment after the build stage. This ensures that the code is always in a deployable state.</p>
+                    <p><strong>Simple Version:</strong> It’s like having a robot that deploys your code to a live website or app, ensuring everything works smoothly every time there's a change.</p>
+                    <h4>Jenkins Pipeline: The Heart of Jenkins</h4>
+                    <p>The Jenkins Pipeline is a suite of plugins that supports implementing and integrating continuous delivery pipelines into Jenkins. Pipelines define the entire CI/CD process of your software, from code commit to deployment.</p>
+                    <p><strong>Simple Version:</strong> Imagine a pipeline as a series of steps (or stages) that your code goes through, from being written to being live on a server. Jenkins automates these steps.</p>
+                    <h4>Key Components of Jenkins</h4>
+                    <p><strong>Jobs:</strong> These are tasks that Jenkins runs. It could be building your code, running tests, or deploying to a server.</p>
+                    <p><strong>Builds:</strong> These are individual instances of jobs. Each time you run a job, it’s called a build.</p>
+                    <p><strong>Plugins:</strong> Jenkins is highly customizable through plugins, which extend its functionality.</p>
+                    <h4>My Simplified Workflow</h4>
+                    <p>When I started using Jenkins, my workflow was:</p>
+                    <ol>
+                        <li><strong>Set Up Jenkins:</strong> Install Jenkins on a server (or use Jenkins-as-a-Service).</li>
+                        <li><strong>Create a Job:</strong> Define what you want Jenkins to do. This could be building your project, running tests, or deploying your application.</li>
+                        <li><strong>Configure Source Control:</strong> Connect Jenkins to your version control system (like GitHub) to automatically trigger jobs when there are code changes.</li>
+                        <li><strong>Add Steps:</strong> Define each step in the job (e.g., compile code, run tests).</li>
+                        <li><strong>Run and Monitor:</strong> Start the job and monitor the results.</li>
+                    </ol>
+                    <h4>Final Thoughts</h4>
+                    <p>By breaking down Jenkins into simpler concepts, I was able to understand and appreciate its power and flexibility. Now, Jenkins is an indispensable tool in my development toolkit, and I hope this simplified explanation helps you get started with it too!</p>
+                    <p>Feel free to reach out if you have any questions or need further clarification. Happy automating!</p>
+                </article>
             </div>
         </section>
 
@@ -56,7 +91,7 @@
             <div class="container">
                 <h2>Contact Me</h2>
                 <p>If you have any questions, feel free to reach out!</p>
-                <form action="https://formspree.io/f/mwkgdnek" method="POST">
+                <form action="https://formspree.io/f/{your_form_id}" method="POST">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
                     <label for="email">Email:</label>
