@@ -22,101 +22,261 @@
         <p>The CKA exam is known for being hands-on, requiring candidates to solve real-world scenarios. Here are some of the tasks I encountered during the exam:</p>
         
         <h3>1. Monitor Pod Logs and Extract Error Messages</h3>
-        <p>One of the tasks required me to monitor the logs of a pod named <code>foo</code> and extract log lines corresponding to a specific error message, <code>unable-to-access-website</code>. This log data needed to be written to a file.</p>
+        <p><strong>Question:</strong> Monitor the logs of the pod <code>foo</code> and extract log lines corresponding to the error <code>unable-to-access-website</code>. Write these lines to <code>/opt/KULM00201/foo</code>.</p>
+        <p><strong>Explanation:</strong> Use the <code>kubectl logs</code> command to get the logs of the pod, filter the logs with <code>grep</code> to find the error message, and redirect the output to the specified file.</p>
         <pre><code>kubectl logs foo | grep 'unable-to-access-website' > /opt/KULM00201/foo</code></pre>
 
         <h3>2. Sorting Persistent Volumes by Capacity</h3>
-        <p>Another task involved listing all persistent volumes (PVs) in the cluster, sorted by their storage capacity, and saving the output to a file.</p>
+        <p><strong>Question:</strong> List all persistent volumes sorted by capacity and save the output to <code>/opt/KUCC00102/volume_list</code>.</p>
+        <p><strong>Explanation:</strong> The <code>kubectl get pv</code> command with the <code>--sort-by</code> option allows you to sort persistent volumes by capacity.</p>
         <pre><code>kubectl get pv --sort-by=.spec.capacity.storage > /opt/KUCC00102/volume_list</code></pre>
 
         <h3>3. Deploy a DaemonSet</h3>
-        <p>Deploying a DaemonSet to ensure that a single instance of the <code>nginx</code> pod is running on each node was another crucial task.</p>
-        <pre><code>
-kubectl create -f ds.yaml
-kubectl get ds
-kubectl get po -A
-        </code></pre>
+        <p><strong>Question:</strong> Ensure that a single instance of the <code>nginx</code> pod is running on each node using a DaemonSet named <code>ds-kusc00201</code>. Do not override any taints currently in place.</p>
+        <p><strong>Explanation:</strong> A DaemonSet ensures that a copy of a pod runs on all (or some) nodes in the cluster. Create a DaemonSet YAML file and apply it to the cluster.</p>
+        <pre><code class="yaml">apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ds-kusc00201
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx</code></pre>
+        <p>To apply this DaemonSet:</p>
+        <pre><code>kubectl apply -f ds-kusc00201.yaml</code></pre>
 
         <h3>4. Add an Init Container to a Pod</h3>
-        <p>In this task, I needed to modify a pod specification to include an init container. The init container's job was to create an empty file, and if the file didn't exist, the pod should exit.</p>
+        <p><strong>Question:</strong> Add an init container to the pod <code>hungry-bear</code> that creates an empty file <code>/workdir/calm.txt</code>. If the file isn’t detected, the pod should exit.</p>
+        <p><strong>Explanation:</strong> Init containers run before the main containers and can be used to perform initialization tasks such as file creation.</p>
+        <pre><code class="yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: hungry-bear
+spec:
+  volumes:
+  - name: workdir
+    emptyDir: {}
+  containers:
+  - name: checker
+    image: alpine
+    command: ["/bin/sh", "-c", "if [ -f /workdir/calm.txt ]; then sleep 10000; else exit 1; fi"]
+    volumeMounts:
+    - name: workdir
+      mountPath: /workdir
+  initContainers:
+  - name: create
+    image: alpine
+    command: ["/bin/sh", "-c", "touch /workdir/calm.txt"]
+    volumeMounts:
+    - name: workdir
+      mountPath: /workdir</code></pre>
+        <p>To apply this pod configuration:</p>
+        <pre><code>kubectl apply -f hungry-bear.yaml</code></pre>
 
         <h3>5. Scheduling Pods with Node Selectors</h3>
-        <p>Another scenario required me to schedule a pod on a node with specific characteristics, using a node selector.</p>
-        <pre><code>
-kubectl run nginx-kusc00401 --image=nginx --dry-run=client -o yaml > nginx-kusc00401.yaml
-        </code></pre>
+        <p><strong>Question:</strong> Schedule a pod named <code>nginx-kusc00401</code> with an <code>nginx</code> image on a node with a selector <code>disk=ssd</code>.</p>
+        <p><strong>Explanation:</strong> Node selectors are used to assign pods to nodes with specific labels.</p>
+        <pre><code class="yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-kusc00401
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  nodeSelector:
+    disk: ssd</code></pre>
+        <p>To apply this pod configuration:</p>
+        <pre><code>kubectl apply -f nginx-kusc00401.yaml</code></pre>
 
         <h3>6. Upgrading Kubernetes Components</h3>
-        <p>One of the more challenging tasks was upgrading the Kubernetes control plane and node components to a specific version. This included upgrading <code>kubeadm</code>, <code>kubectl</code>, and <code>kubelet</code> on the master node, while ensuring minimal disruption to the cluster.</p>
-        <pre><code>
-kubectl cordon k8s-master
+        <p><strong>Question:</strong> Upgrade the Kubernetes control plane and node components on the master node from version 1.20.0 to version 1.20.1.</p>
+        <p><strong>Explanation:</strong> The upgrade process involves draining the node, upgrading the components, and uncordoning the node after the upgrade.</p>
+        <pre><code>kubectl cordon k8s-master
 kubectl drain k8s-master --delete-local-data --ignore-daemonsets --force
 sudo apt-get install -y kubeadm=1.20.1-00 kubelet=1.20.1-00 kubectl=1.20.1-00
 sudo kubeadm upgrade apply v1.20.1 --etcd-upgrade=false
 sudo systemctl daemon-reload
 sudo systemctl restart kubelet
-kubectl uncordon k8s-master
-        </code></pre>
+kubectl uncordon k8s-master</code></pre>
 
         <h3>7. Creating Kubernetes Secrets and Using Them in Pods</h3>
-        <p>In this task, I was required to create a Kubernetes secret and then use it in two different pods. One pod used the secret as a file mount, while the other used it as an environment variable.</p>
-        <pre><code>
-kubectl create secret generic super-secret --from-literal=password=bob
-        </code></pre>
+        <p><strong>Question:</strong> Create a secret named <code>super-secret</code> with the password <code>bob</code> and use it in two different pods: one as a file mount and the other as an environment variable.</p>
+        <p><strong>Explanation:</strong> Kubernetes secrets can be mounted as files or exposed as environment variables.</p>
+        <pre><code>kubectl create secret generic super-secret --from-literal=password=bob</code></pre>
+        <p>To use this secret in a pod as a file mount:</p>
+        <pre><code class="yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-secrets-via-file
+spec:
+  containers:
+  - name: redis
+    image: redis
+    volumeMounts:
+    - name: secret-volume
+      mountPath: /secrets
+  volumes:
+  - name: secret-volume
+    secret:
+      secretName: super-secret</code></pre>
+        <p>To use this secret in a pod as an environment variable:</p>
+        <pre><code class="yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-secrets-via-env
+spec:
+  containers:
+  - name: redis
+    image: redis
+    env:
+    - name: CONFIDENTIAL
+      valueFrom:
+        secretKeyRef:
+          name: super-secret
+          key: password</code></pre>
 
         <h3>8. Creating a Non-Persistent Redis Pod</h3>
-        <p>This task involved creating a Redis pod with a non-persistent volume in the staging namespace.</p>
-        <pre><code>
-kubectl run non-persistent-redis --image=redis --dry-run=client -o yaml > redis.yaml
-        </code></pre>
+        <p><strong>Question:</strong> Create a pod named <code>non-persistent-redis</code> using the <code>redis</code> image, with a volume named <code>cache-control</code> that is not persistent.</p>
+        <p><strong>Explanation:</strong> Use an emptyDir volume for non-persistent storage that will be deleted when the pod is terminated.</p>
+        <pre><code class="yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: non-persistent-redis
+spec:
+  containers:
+  - name: redis
+    image: redis
+    volumeMounts:
+    - name: cache-control
+      mountPath: /data/redis
+  volumes:
+  - name: cache-control
+    emptyDir: {}</code></pre>
+        <p>To apply this pod configuration:</p>
+        <pre><code>kubectl apply -f non-persistent-redis.yaml</code></pre>
 
         <h3>9. Creating and Exposing a Deployment with DNS Lookups</h3>
-        <p>Here, I had to create a deployment named <code>nginx-random</code> and expose it through a service. Then, I used DNS lookups to verify the service and pod DNS records.</p>
-        <pre><code>
-kubectl create deploy nginx-random --image=nginx
-kubectl expose deploy nginx-random --name=nginx-random --port=80 --target-port=80
-        </code></pre>
+        <p><strong>Question:</strong> Create a deployment named <code>nginx-random</code> and expose it via a service. Ensure that the service and pods are accessible via their respective DNS records.</p>
+        <p><strong>Explanation:</strong> Use a deployment to manage pods, and expose it through a service. Use <code>nslookup</code> to verify DNS resolution.</p>
+        <pre><code class="yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-random
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx</code></pre>
+        <pre><code>kubectl expose deploy nginx-random --name=nginx-random --port=80 --target-port=80
+kubectl run nslookup --image=busybox --rm -it -- nslookup nginx-random > /opt/KUNW00601/service.dns</code></pre>
 
         <h3>10. Creating an Etcd Snapshot</h3>
-        <p>Taking a snapshot of the etcd instance running at <code>https://127.0.0.1:2379</code> was another critical task.</p>
-        <pre><code>
-ETCDCTL_API=3 etcdctl --endpoints="https://127.0.0.1:2379" --cacert=/opt/KUCM00302/ca.crt --cert=/opt/KUCM00302/etcd-client.crt --key=/opt/KUCM00302/etcd-client.key snapshot save /srv/data/etcd-snapshot.db
-        </code></pre>
+        <p><strong>Question:</strong> Create a snapshot of the etcd instance running at <code>https://127.0.0.1:2379</code> and save it to <code>/srv/data/etcd-snapshot.db</code>.</p>
+        <p><strong>Explanation:</strong> Use the <code>etcdctl</code> command to take a snapshot of the etcd database.</p>
+        <pre><code>ETCDCTL_API=3 etcdctl --endpoints="https://127.0.0.1:2379" --cacert=/opt/KUCM00302/ca.crt --cert=/opt/KUCM00302/etcd-client.crt --key=/opt/KUCM00302/etcd-client.key snapshot save /srv/data/etcd-snapshot.db</code></pre>
 
         <h3>11. Configuring the Kubelet Service to Launch a Pod</h3>
-        <p>This task required configuring the kubelet systemd-managed service on a node to automatically launch a pod containing a single container.</p>
+        <p><strong>Question:</strong> Configure the kubelet systemd-managed service on a node to launch a pod containing a single container using the <code>httpd</code> image.</p>
+        <p><strong>Explanation:</strong> Modify the kubelet configuration to launch the pod by placing the pod spec in the <code>/etc/kubernetes/manifests</code> directory.</p>
+        <pre><code class="yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: webtool
+spec:
+  containers:
+  - name: webtool
+    image: httpd</code></pre>
+        <p>To apply this configuration, place the YAML file in <code>/etc/kubernetes/manifests</code> on the appropriate node.</p>
 
         <h3>12. Setting Up a Kubernetes Cluster with Kubeadm</h3>
-        <p>In this scenario, I had to set up a Kubernetes cluster using <code>kubeadm</code> and join a node to the cluster.</p>
+        <p><strong>Question:</strong> Set up a Kubernetes cluster using <code>kubeadm</code> and join a node to the cluster.</p>
+        <p><strong>Explanation:</strong> Initialize the cluster using <code>kubeadm init</code> and join the node using the <code>kubeadm join</code> command provided after initialization.</p>
+        <pre><code>kubeadm init --config /etc/kubeadm.conf --ignore-preflight-errors=all
+kubeadm join --token <token> <master-ip>:<port> --discovery-token-ca-cert-hash sha256:<hash></code></pre>
 
         <h3>13. Listing Pods Using a JSONPath Expression</h3>
-        <p>This task involved retrieving a list of all pods and their namespaces using a JSONPath expression.</p>
-        <pre><code>
-kubectl get pods -o=jsonpath="{.items[*]['metadata.name', 'metadata.namespace']}"
-        </code></pre>
+        <p><strong>Question:</strong> Retrieve a list of all pods showing their names and namespaces using a JSONPath expression.</p>
+        <p><strong>Explanation:</strong> Use the <code>kubectl get pods</code> command with the <code>-o=jsonpath</code> option to format the output.</p>
+        <pre><code>kubectl get pods -o=jsonpath="{.items[*]['metadata.name', 'metadata.namespace']}"</code></pre>
 
         <h3>14. Creating a Busybox Pod with a Sleep Command</h3>
-        <p>Creating a pod that runs a <code>sleep</code> command for 3600 seconds was another straightforward task.</p>
-        <pre><code>
-kubectl run busybox --image=busybox --restart=Never -- /bin/sh -c "sleep 3600"
-        </code></pre>
+        <p><strong>Question:</strong> Create a <code>busybox</code> pod that runs a <code>sleep 3600</code> command.</p>
+        <p><strong>Explanation:</strong> Use the <code>kubectl run</code> command to create a pod that executes the sleep command for 3600 seconds.</p>
+        <pre><code>kubectl run busybox --image=busybox --restart=Never -- /bin/sh -c "sleep 3600"</code></pre>
 
         <h3>15. Creating a ClusterRole and Binding It to a ServiceAccount</h3>
-        <p>In this scenario, I had to create a ClusterRole with specific permissions and bind it to a ServiceAccount in a specific namespace.</p>
-        <pre><code>
-kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployments,statefulsets,daemonsets
+        <p><strong>Question:</strong> Create a ClusterRole named <code>deployment-clusterrole</code> that allows creating Deployments, StatefulSets, and DaemonSets. Bind it to a ServiceAccount named <code>cicd-token</code> in the <code>app-team1</code> namespace.</p>
+        <p><strong>Explanation:</strong> Create a ClusterRole and bind it to the ServiceAccount using a RoleBinding.</p>
+        <pre><code>kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployments,statefulsets,daemonsets
 kubectl create serviceaccount cicd-token --namespace=app-team1
-kubectl create rolebinding deployment-clusterrole --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token --namespace=app-team1
-        </code></pre>
+kubectl create rolebinding deployment-clusterrole-binding --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token --namespace=app-team1</code></pre>
 
         <h3>16. Creating a NetworkPolicy</h3>
-        <p>This task involved creating a NetworkPolicy that allows Pods in one namespace to access a specific port on Pods in another namespace while restricting access to other Pods.</p>
-        <pre><code>
-kubectl create -f network.yaml
-        </code></pre>
+        <p><strong>Question:</strong> Create a NetworkPolicy named <code>allow-port-from-namespace</code> that allows Pods in the <code>my-app</code> namespace to connect to port 9000 of Pods in the <code>echo</code> namespace.</p>
+        <p><strong>Explanation:</strong> Use a NetworkPolicy to restrict traffic to only allow access to Pods listening on port 9000 from the specified namespace.</p>
+        <pre><code class="yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-port-from-namespace
+  namespace: echo
+spec:
+  podSelector:
+    matchLabels: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: my-app
+    ports:
+    - protocol: TCP
+      port: 9000</code></pre>
+        <p>To apply this NetworkPolicy:</p>
+        <pre><code>kubectl apply -f network.yaml</code></pre>
 
         <h3>17. Adding a Streaming Sidecar Container for Logging</h3>
-        <p>In this task, I had to add a streaming sidecar container to an existing pod to integrate it with Kubernetes logging.</p>
+        <p><strong>Question:</strong> Add a streaming sidecar container to an existing pod named <code>big-corp-app</code> to integrate it into Kubernetes' built-in logging architecture.</p>
+        <p><strong>Explanation:</strong> Add a sidecar container that streams logs from a specified file using <code>tail</code>.</p>
+        <pre><code class="yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: big-corp-app
+spec:
+  containers:
+  - name: main
+    image: myapp
+    volumeMounts:
+    - name: logs
+      mountPath: /var/log
+  - name: sidecar
+    image: busybox
+    command: ["/bin/sh", "-c", "tail -n+1 -f /var/log/big-corp-app.log"]
+    volumeMounts:
+    - name: logs
+      mountPath: /var/log
+  volumes:
+  - name: logs
+    emptyDir: {}</code></pre>
+        <p>To apply this pod configuration:</p>
+        <pre><code>kubectl apply -f big-corp-app.yaml</code></pre>
 
         <h2>Tips for Success</h2>
         <p>Here are some tips that helped me succeed in the CKA exam:</p>
