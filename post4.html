@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Journey to Passing the Certified Kubernetes Administrator (CKA) Exam</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>My Journey to Passing the Certified Kubernetes Administrator (CKA) Exam</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <p>Passing the Certified Kubernetes Administrator (CKA) exam was a significant milestone in my career. The journey wasn't easy, but the reward of understanding Kubernetes at a deeper level made it worthwhile. In this post, I’ll share some of the key tasks I faced during the exam, along with tips on how to approach them effectively.</p>
+
+        <h2>Key Questions from the CKA Exam</h2>
+        
+        <p>The CKA exam is known for being hands-on, requiring candidates to solve real-world scenarios. Here are some of the tasks I encountered during the exam:</p>
+        
+        <h3>1. Monitor Pod Logs and Extract Error Messages</h3>
+        <p>One of the tasks required me to monitor the logs of a pod named <code>foo</code> and extract log lines corresponding to a specific error message, <code>unable-to-access-website</code>. This log data needed to be written to a file.</p>
+        <pre><code>kubectl logs foo | grep 'unable-to-access-website' > /opt/KULM00201/foo</code></pre>
+
+        <h3>2. Sorting Persistent Volumes by Capacity</h3>
+        <p>Another task involved listing all persistent volumes (PVs) in the cluster, sorted by their storage capacity, and saving the output to a file.</p>
+        <pre><code>kubectl get pv --sort-by=.spec.capacity.storage > /opt/KUCC00102/volume_list</code></pre>
+
+        <h3>3. Deploy a DaemonSet</h3>
+        <p>Deploying a DaemonSet to ensure that a single instance of the <code>nginx</code> pod is running on each node was another crucial task.</p>
+        <pre><code>
+kubectl create -f ds.yaml
+kubectl get ds
+kubectl get po -A
+        </code></pre>
+
+        <h3>4. Add an Init Container to a Pod</h3>
+        <p>In this task, I needed to modify a pod specification to include an init container. The init container's job was to create an empty file, and if the file didn't exist, the pod should exit.</p>
+
+        <h3>5. Scheduling Pods with Node Selectors</h3>
+        <p>Another scenario required me to schedule a pod on a node with specific characteristics, using a node selector.</p>
+        <pre><code>
+kubectl run nginx-kusc00401 --image=nginx --dry-run=client -o yaml > nginx-kusc00401.yaml
+        </code></pre>
+
+        <h3>6. Upgrading Kubernetes Components</h3>
+        <p>One of the more challenging tasks was upgrading the Kubernetes control plane and node components to a specific version. This included upgrading <code>kubeadm</code>, <code>kubectl</code>, and <code>kubelet</code> on the master node, while ensuring minimal disruption to the cluster.</p>
+        <pre><code>
+kubectl cordon k8s-master
+kubectl drain k8s-master --delete-local-data --ignore-daemonsets --force
+sudo apt-get install -y kubeadm=1.20.1-00 kubelet=1.20.1-00 kubectl=1.20.1-00
+sudo kubeadm upgrade apply v1.20.1 --etcd-upgrade=false
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+kubectl uncordon k8s-master
+        </code></pre>
+
+        <h3>7. Creating Kubernetes Secrets and Using Them in Pods</h3>
+        <p>In this task, I was required to create a Kubernetes secret and then use it in two different pods. One pod used the secret as a file mount, while the other used it as an environment variable.</p>
+        <pre><code>
+kubectl create secret generic super-secret --from-literal=password=bob
+        </code></pre>
+
+        <h3>8. Creating a Non-Persistent Redis Pod</h3>
+        <p>This task involved creating a Redis pod with a non-persistent volume in the staging namespace.</p>
+        <pre><code>
+kubectl run non-persistent-redis --image=redis --dry-run=client -o yaml > redis.yaml
+        </code></pre>
+
+        <h3>9. Creating and Exposing a Deployment with DNS Lookups</h3>
+        <p>Here, I had to create a deployment named <code>nginx-random</code> and expose it through a service. Then, I used DNS lookups to verify the service and pod DNS records.</p>
+        <pre><code>
+kubectl create deploy nginx-random --image=nginx
+kubectl expose deploy nginx-random --name=nginx-random --port=80 --target-port=80
+        </code></pre>
+
+        <h3>10. Creating an Etcd Snapshot</h3>
+        <p>Taking a snapshot of the etcd instance running at <code>https://127.0.0.1:2379</code> was another critical task.</p>
+        <pre><code>
+ETCDCTL_API=3 etcdctl --endpoints="https://127.0.0.1:2379" --cacert=/opt/KUCM00302/ca.crt --cert=/opt/KUCM00302/etcd-client.crt --key=/opt/KUCM00302/etcd-client.key snapshot save /srv/data/etcd-snapshot.db
+        </code></pre>
+
+        <h3>11. Configuring the Kubelet Service to Launch a Pod</h3>
+        <p>This task required configuring the kubelet systemd-managed service on a node to automatically launch a pod containing a single container.</p>
+
+        <h3>12. Setting Up a Kubernetes Cluster with Kubeadm</h3>
+        <p>In this scenario, I had to set up a Kubernetes cluster using <code>kubeadm</code> and join a node to the cluster.</p>
+
+        <h3>13. Listing Pods Using a JSONPath Expression</h3>
+        <p>This task involved retrieving a list of all pods and their namespaces using a JSONPath expression.</p>
+        <pre><code>
+kubectl get pods -o=jsonpath="{.items[*]['metadata.name', 'metadata.namespace']}"
+        </code></pre>
+
+        <h3>14. Creating a Busybox Pod with a Sleep Command</h3>
+        <p>Creating a pod that runs a <code>sleep</code> command for 3600 seconds was another straightforward task.</p>
+        <pre><code>
+kubectl run busybox --image=busybox --restart=Never -- /bin/sh -c "sleep 3600"
+        </code></pre>
+
+        <h3>15. Creating a ClusterRole and Binding It to a ServiceAccount</h3>
+        <p>In this scenario, I had to create a ClusterRole with specific permissions and bind it to a ServiceAccount in a specific namespace.</p>
+        <pre><code>
+kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployments,statefulsets,daemonsets
+kubectl create serviceaccount cicd-token --namespace=app-team1
+kubectl create rolebinding deployment-clusterrole --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token --namespace=app-team1
+        </code></pre>
+
+        <h3>16. Creating a NetworkPolicy</h3>
+        <p>This task involved creating a NetworkPolicy that allows Pods in one namespace to access a specific port on Pods in another namespace while restricting access to other Pods.</p>
+        <pre><code>
+kubectl create -f network.yaml
+        </code></pre>
+
+        <h3>17. Adding a Streaming Sidecar Container for Logging</h3>
+        <p>In this task, I had to add a streaming sidecar container to an existing pod to integrate it with Kubernetes logging.</p>
+
+        <h2>Tips for Success</h2>
+        <p>Here are some tips that helped me succeed in the CKA exam:</p>
+        <ul>
+            <li><strong>Practice with Real Scenarios:</strong> The exam is all about practical skills. Make sure you are comfortable with tasks like deploying applications, managing storage, and troubleshooting.</li>
+            <li><strong>Master YAML Files:</strong> Many tasks will require you to modify or create YAML files. Understanding Kubernetes objects and how to define them in YAML is crucial.</li>
+            <li><strong>Use Time Wisely:</strong> You’ll need to manage your time effectively. Prioritize tasks you’re confident with and come back to more challenging ones.</li>
+            <li><strong>Stay Calm Under Pressure:</strong> The exam can be intense, but staying calm and methodical will help you succeed.</li>
+        </ul>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Tal Naeh. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
