@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="en" data-astro-cid-bvzihdzo> <head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="Tal's Blog" href="https://tal-naeh.github.io/rss.xml"><!-- Font preloads --><link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://tal-naeh.github.io/blog/docker-ecosystem-overview/"><!-- Primary Meta Tags --><title>Docker Ecosystem Overview - Understanding the Core Components</title><meta name="title" content="Docker Ecosystem Overview - Understanding the Core Components"><meta name="description" content="A comprehensive guide to understanding Docker's ecosystem: Docker Engine, Docker Hub, and Docker Compose. Learn how these components work together to simplify application deployment."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://tal-naeh.github.io/blog/docker-ecosystem-overview/"><meta property="og:title" content="Docker Ecosystem Overview - Understanding the Core Components"><meta property="og:description" content="A comprehensive guide to understanding Docker's ecosystem: Docker Engine, Docker Hub, and Docker Compose. Learn how these components work together to simplify application deployment."><meta property="og:image" content="https://www.docker.com/wp-content/uploads/2022/03/vertical-logo-monochromatic.png"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://tal-naeh.github.io/blog/docker-ecosystem-overview/"><meta property="twitter:title" content="Docker Ecosystem Overview - Understanding the Core Components"><meta property="twitter:description" content="A comprehensive guide to understanding Docker's ecosystem: Docker Engine, Docker Hub, and Docker Compose. Learn how these components work together to simplify application deployment."><meta property="twitter:image" content="https://www.docker.com/wp-content/uploads/2022/03/vertical-logo-monochromatic.png"><style>:root{--accent: #2337ff;--accent-dark: #000d8a;--black: 15, 18, 25;--gray: 96, 115, 159;--gray-light: 229, 233, 240;--gray-dark: 34, 41, 57;--gray-gradient: rgba(var(--gray-light), 50%), #fff;--box-shadow: 0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%), 0 16px 32px rgba(var(--gray), 33%)}@font-face{font-family:Atkinson;src:url(/fonts/atkinson-regular.woff) format("woff");font-weight:400;font-style:normal;font-display:swap}@font-face{font-family:Atkinson;src:url(/fonts/atkinson-bold.woff) format("woff");font-weight:700;font-style:normal;font-display:swap}body{font-family:Atkinson,sans-serif;margin:0;padding:0;text-align:left;background:linear-gradient(var(--gray-gradient)) no-repeat;background-size:100% 600px;word-wrap:break-word;overflow-wrap:break-word;color:rgb(var(--gray-dark));font-size:20px;line-height:1.7}main{width:720px;max-width:calc(100% - 2em);margin:auto;padding:3em 1em}h1,h2,h3,h4,h5,h6{margin:0 0 .5rem;color:rgb(var(--black));line-height:1.2}h1{font-size:3.052em}h2{font-size:2.441em}h3{font-size:1.953em}h4{font-size:1.563em}h5{font-size:1.25em}strong,b{font-weight:700}a,a:hover{color:var(--accent)}p{margin-bottom:1em}.prose p{margin-bottom:2em}textarea{width:100%;font-size:16px}input{font-size:16px}table{width:100%}img{max-width:100%;height:auto;border-radius:8px}code{padding:2px 5px;background-color:rgb(var(--gray-light));border-radius:2px}pre{padding:1.5em;border-radius:8px}pre>code{all:unset}blockquote{border-left:4px solid var(--accent);padding:0 0 0 20px;margin:0;font-size:1.333em}hr{border:none;border-top:1px solid rgb(var(--gray-light))}@media (max-width: 720px){body{font-size:18px}main{padding:1em}}.sr-only{border:0;padding:0;margin:0;position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px 1px 1px 1px);clip:rect(1px,1px,1px,1px);clip-path:inset(50%);white-space:nowrap}a[data-astro-cid-eimmu3lg]{display:inline-block;text-decoration:none}a[data-astro-cid-eimmu3lg].active{font-weight:bolder;text-decoration:underline}header[data-astro-cid-3ef6ksr2]{margin:0;padding:0 1em;background:#fff;box-shadow:0 2px 8px rgba(var(--black),5%)}h2[data-astro-cid-3ef6ksr2]{margin:0;font-size:1em}h2[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2],h2[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2].active{text-decoration:none}nav[data-astro-cid-3ef6ksr2]{display:flex;align-items:center;justify-content:space-between}nav[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2]{padding:1em .5em;color:var(--black);border-bottom:4px solid transparent;text-decoration:none}nav[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2].active{text-decoration:none;border-bottom-color:var(--accent)}.social-links[data-astro-cid-3ef6ksr2],.social-links[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2]{display:flex}@media (max-width: 720px){.social-links[data-astro-cid-3ef6ksr2]{display:none}}footer[data-astro-cid-sz7xmlte]{padding:2em 1em 6em;background:linear-gradient(var(--gray-gradient)) no-repeat;color:rgb(var(--gray));text-align:center}.social-links[data-astro-cid-sz7xmlte]{display:flex;justify-content:center;gap:1em;margin-top:1em}.social-links[data-astro-cid-sz7xmlte] a[data-astro-cid-sz7xmlte]{text-decoration:none;color:rgb(var(--gray))}.social-links[data-astro-cid-sz7xmlte] a[data-astro-cid-sz7xmlte]:hover{color:rgb(var(--gray-dark))}
+main[data-astro-cid-bvzihdzo]{width:calc(100% - 2em);max-width:100%;margin:0}.hero-image[data-astro-cid-bvzihdzo]{width:100%}.hero-image[data-astro-cid-bvzihdzo] img[data-astro-cid-bvzihdzo]{display:block;margin:0 auto;border-radius:12px;box-shadow:var(--box-shadow)}.prose[data-astro-cid-bvzihdzo]{width:720px;max-width:calc(100% - 2em);margin:auto;padding:1em;color:rgb(var(--gray-dark))}.title[data-astro-cid-bvzihdzo]{margin-bottom:1em;padding:1em 0;text-align:center;line-height:1}.title[data-astro-cid-bvzihdzo] h1[data-astro-cid-bvzihdzo]{margin:0 0 .5em}.date[data-astro-cid-bvzihdzo]{margin-bottom:.5em;color:rgb(var(--gray))}.last-updated-on[data-astro-cid-bvzihdzo]{font-style:italic}
+</style></head> <body data-astro-cid-bvzihdzo> <header data-astro-cid-3ef6ksr2> <nav data-astro-cid-3ef6ksr2> <h2 data-astro-cid-3ef6ksr2><a href="/" data-astro-cid-3ef6ksr2>Tal's Blog</a></h2> <div class="internal-links" data-astro-cid-3ef6ksr2> <a href="/" data-astro-cid-3ef6ksr2="true" data-astro-cid-eimmu3lg> Home </a>  <a href="/blog" class="active" data-astro-cid-3ef6ksr2="true" data-astro-cid-eimmu3lg> Blog </a>  <a href="/about" data-astro-cid-3ef6ksr2="true" data-astro-cid-eimmu3lg> About </a>  </div> <div class="social-links" data-astro-cid-3ef6ksr2> <a href="https://linkedin.com/in/tal-naeh" target="_blank" data-astro-cid-3ef6ksr2> <span class="sr-only" data-astro-cid-3ef6ksr2>Follow on LinkedIn</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-3ef6ksr2><path fill="currentColor" d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z" data-astro-cid-3ef6ksr2></path></svg> </a> <a href="https://github.com/Tal-Naeh" target="_blank" data-astro-cid-3ef6ksr2> <span class="sr-only" data-astro-cid-3ef6ksr2>Visit my GitHub</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-3ef6ksr2><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-3ef6ksr2></path></svg> </a> </div> </nav> </header>  <main data-astro-cid-bvzihdzo> <article data-astro-cid-bvzihdzo> <div class="hero-image" data-astro-cid-bvzihdzo> <img src="https://www.docker.com/wp-content/uploads/2022/03/vertical-logo-monochromatic.png" alt="Docker Ecosystem Overview - Understanding the Core Components" style="max-width: 400px; height: auto;" data-astro-cid-bvzihdzo> </div> <div class="prose" data-astro-cid-bvzihdzo> <div class="title" data-astro-cid-bvzihdzo> <div class="date" data-astro-cid-bvzihdzo> <time datetime="2025-01-06T00:00:00.000Z"> Jan 6, 2025 </time> <div class="last-updated-on" data-astro-cid-bvzihdzo>
+Last updated on <time datetime="2025-01-06T00:00:00.000Z"> Jan 6, 2025 </time> </div> </div> <h1 data-astro-cid-bvzihdzo>Docker Ecosystem Overview - Understanding the Core Components</h1> <hr data-astro-cid-bvzihdzo> </div>  
+
+<h2 id="tldr">TL;DR</h2>
+
+<p>Docker's ecosystem consists of three main components that work together to simplify application deployment:</p>
+
+<ul>
+<li><strong>Docker Engine</strong> - The core runtime that builds and runs containers on your machine</li>
+<li><strong>Docker Hub</strong> - A cloud registry where you store and share container images (like GitHub for containers)</li>
+<li><strong>Docker Compose</strong> - A tool that orchestrates multiple containers using a simple YAML file</li>
+</ul>
+
+<p>Together, they solve the "it works on my machine" problem by packaging applications with all their dependencies into portable containers that run consistently anywhere.</p>
+
+<hr>
+
+<p>Docker has transformed how we build, ship, and run applications. But Docker isn't just one tool - it's an ecosystem of interconnected components that work together to make containerization simple and powerful.</p>
+
+<p>In this guide, we'll break down the three core components of the Docker ecosystem: Docker Engine, Docker Hub, and Docker Compose. By the end, you'll understand how each piece fits together and why they're essential for modern development workflows.</p>
+
+<h2 id="what-makes-docker-special">What Makes Docker Special?</h2>
+
+<p>Before diving into the components, let's clarify what Docker actually does. Docker packages applications and their dependencies into containers - lightweight, portable units that run consistently anywhere. Think of it like this: if your application were a shipped product, Docker is the standardized container that ensures it arrives intact, regardless of the shipping method.</p>
+
+<p>This consistency eliminates the classic "it works on my machine" problem that has plagued developers for decades.</p>
+
+<h2 id="docker-engine---the-foundation">Docker Engine - The Foundation</h2>
+
+<p>Docker Engine is where everything starts. It's the runtime that actually creates, manages, and runs your containers.</p>
+
+<h3 id="how-docker-engine-works">How Docker Engine Works</h3>
+
+<p>Docker Engine operates as a client-server application with three main parts:</p>
+
+<p><strong>Docker Daemon (dockerd)</strong> - The background service that does the heavy lifting. It builds images, runs containers, and manages everything behind the scenes.</p>
+
+<p><strong>Docker Client</strong> - The command-line interface you interact with. When you type <code>docker run</code> or <code>docker build</code>, you're talking to the client.</p>
+
+<p><strong>Docker API</strong> - The communication layer that lets the client talk to the daemon, and allows other tools to integrate with Docker.</p>
+
+<h3 id="what-docker-engine-handles">What Docker Engine Handles</h3>
+
+<p><strong>Container Lifecycle</strong> - Starting, stopping, restarting, and removing containers<br>
+<strong>Image Management</strong> - Building, storing, and organizing container images<br>
+<strong>Networking</strong> - Connecting containers to each other and the outside world<br>
+<strong>Storage</strong> - Managing persistent data through volumes and bind mounts<br>
+<strong>Resource Control</strong> - Limiting CPU, memory, and other resources per container</p>
+
+<h3 id="the-architecture-behind-the-scenes">The Architecture Behind the Scenes</h3>
+
+<p>Docker Engine leverages several Linux kernel features to make containers work:</p>
+
+<ul>
+<li><strong>Namespaces</strong> isolate processes from each other</li>
+<li><strong>Control Groups (cgroups)</strong> limit resource usage</li>
+<li><strong>Union File Systems</strong> enable efficient image layering</li>
+<li><strong>Network interfaces</strong> handle container communication</li>
+</ul>
+
+<p>You don't need to understand these deeply, but knowing they exist helps explain why Docker containers are so lightweight compared to virtual machines.</p>
+
+<h2 id="docker-hub---the-container-registry">Docker Hub - The Container Registry</h2>
+
+<p>Docker Hub is essentially GitHub for container images. It's where you store, share, and download pre-built containers.</p>
+
+<h3 id="why-docker-hub-matters">Why Docker Hub Matters</h3>
+
+<p><strong>Public Images</strong> - Thousands of pre-built images for popular software like databases, web servers, and programming runtimes. Need MySQL? Just pull the official image.</p>
+
+<p><strong>Private Repositories</strong> - Store your company's proprietary applications securely.</p>
+
+<p><strong>Official Images</strong> - Curated, maintained images for major software projects. These are your go-to choice for production use.</p>
+
+<p><strong>Automated Builds</strong> - Connect your GitHub repo, and Docker Hub automatically builds new images when you push code changes.</p>
+
+<h3 id="how-it-works-in-practice">How It Works in Practice</h3>
+
+<p>When you run <code>docker pull nginx</code>, Docker Engine automatically connects to Docker Hub and downloads the nginx image. When you push your own image with <code>docker push myapp:latest</code>, it goes to your Docker Hub repository.</p>
+
+<p>The clever part is Docker's layered approach. Images are built in layers, and Docker Hub only downloads the layers you don't already have. This makes everything faster and more efficient.</p>
+
+<h3 id="beyond-docker-hub">Beyond Docker Hub</h3>
+
+<p>While Docker Hub is the default choice, alternatives exist for specific needs:</p>
+<ul>
+<li><strong>AWS ECR</strong> for Amazon cloud deployments</li>
+<li><strong>Google GCR</strong> for Google Cloud</li>
+<li><strong>Azure ACR</strong> for Microsoft Azure</li>
+<li><strong>Harbor</strong> for self-hosted registries</li>
+</ul>
+
+<h2 id="docker-compose---managing-multi-container-applications">Docker Compose - Managing Multi-Container Applications</h2>
+
+<p>Real applications rarely run in a single container. You typically need a web server, database, cache, and maybe some background workers. Docker Compose solves the complexity of orchestrating multiple containers.</p>
+
+<h3 id="the-power-of-docker-compose">The Power of Docker Compose</h3>
+
+<p><strong>Single Configuration File</strong> - Define your entire application stack in one YAML file<br>
+<strong>Service Dependencies</strong> - Specify that your web app needs the database to start first<br>
+<strong>Environment Management</strong> - Switch between development, testing, and production setups easily<br>
+<strong>One-Command Deployment</strong> - Start your entire application with <code>docker-compose up</code></p>
+
+<h3 id="a-real-example">A Real Example</h3>
+
+<p>Here's what a typical application setup looks like:</p>
+
+<pre><code class="language-yaml">version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/myapp
+  
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  redis:
+    image: redis:alpine
+    
+volumes:
+  postgres_data:
+</code></pre>
+
+<p>This single file defines a complete application with a web service, PostgreSQL database, and Redis cache.</p>
+
+<h3 id="essential-docker-compose-commands">Essential Docker Compose Commands</h3>
+
+<p><strong>docker-compose up</strong> - Start all services (add <code>-d</code> to run in background)<br>
+<strong>docker-compose down</strong> - Stop and remove everything<br>
+<strong>docker-compose logs</strong> - See what's happening in your services<br>
+<strong>docker-compose exec web bash</strong> - Jump into a running container<br>
+<strong>docker-compose build</strong> - Rebuild your custom images</p>
+
+<h2 id="how-everything-works-together">How Everything Works Together</h2>
+
+<p>The magic happens when these components integrate seamlessly:</p>
+
+<ol>
+<li><strong>Development</strong> - You write code, create a Dockerfile, and use Docker Engine to build an image</li>
+<li><strong>Sharing</strong> - Push your image to Docker Hub so your team can use it</li>
+<li><strong>Deployment</strong> - Use Docker Compose to orchestrate your application with its dependencies</li>
+<li><strong>Scaling</strong> - Easily scale individual services up or down as needed</li>
+</ol>
+
+<h3 id="a-typical-workflow">A Typical Workflow</h3>
+
+<p>Let's walk through a real development cycle:</p>
+
+<ol>
+<li>Developer writes application code and creates a Dockerfile</li>
+<li><code>docker build -t myapp .</code> creates a local image</li>
+<li><code>docker push myapp:latest</code> uploads to Docker Hub</li>
+<li>Team members run <code>docker-compose up</code> to start the full application locally</li>
+<li>Production deployment uses the same Docker Compose file with environment-specific settings</li>
+</ol>
+
+<h2 id="best-practices-that-actually-matter">Best Practices That Actually Matter</h2>
+
+<h3 id="docker-engine-tips">Docker Engine Tips</h3>
+
+<p><strong>Use specific image tags</strong> - Don't rely on <code>latest</code> in production<br>
+<strong>Multi-stage builds</strong> - Keep your final images small by using build stages<br>
+<strong>Health checks</strong> - Add health checks so Docker knows when your app is ready<br>
+<strong>Resource limits</strong> - Prevent runaway containers from consuming all system resources</p>
+
+<h3 id="docker-hub-guidelines">Docker Hub Guidelines</h3>
+
+<p><strong>Scan for vulnerabilities</strong> - Use Docker Hub's security scanning features<br>
+<strong>Organize with tags</strong> - Use meaningful tags like <code>v1.2.3</code> or <code>2024-01-15</code><br>
+<strong>Private for proprietary code</strong> - Don't accidentally expose internal applications<br>
+<strong>Automate builds</strong> - Connect to GitHub for consistent image building</p>
+
+<h3 id="docker-compose-best-practices">Docker Compose Best Practices</h3>
+
+<p><strong>Environment variables</strong> - Use <code>.env</code> files for configuration<br>
+<strong>Named volumes</strong> - Use named volumes instead of bind mounts for databases<br>
+<strong>Service limits</strong> - Define CPU and memory limits for each service<br>
+<strong>Development vs Production</strong> - Use <code>docker-compose.override.yml</code> for environment-specific settings</p>
+
+<h2 id="common-pitfalls-to-avoid">Common Pitfalls to Avoid</h2>
+
+<p><strong>Running as root</strong> - Always use non-root users in your containers<br>
+<strong>Storing data in containers</strong> - Use volumes for anything that needs to persist<br>
+<strong>Ignoring logs</strong> - Set up proper logging from day one<br>
+<strong>Oversized images</strong> - Keep images lean by removing unnecessary packages</p>
+
+<h2 id="the-bigger-picture">The Bigger Picture</h2>
+
+<p>Docker's ecosystem extends beyond these core components. Docker Desktop provides a complete development environment for Windows and Mac users. Kubernetes can orchestrate Docker containers at scale. CI/CD pipelines integrate Docker for consistent deployments.</p>
+
+<p>But mastering Docker Engine, Docker Hub, and Docker Compose gives you the foundation for everything else. These three components handle 90% of what most developers need.</p>
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>If you're new to Docker, start with Docker Engine. Learn to build and run simple containers. Then move to Docker Hub to share and discover images. Finally, use Docker Compose when you need multiple services working together.</p>
+
+<p>The learning curve is gentler than it appears. Each component builds on the previous one, and the concepts transfer directly to more advanced container orchestration tools.</p>
+
+<p>Docker has simplified application deployment in ways that seemed impossible just a few years ago. Understanding these core components puts you in control of that power.</p>
+
+<h2 id="final-thoughts">Final Thoughts</h2>
+
+<p>The Docker ecosystem might seem complex at first, but it's actually quite logical once you understand the role each component plays. Docker Engine handles the heavy lifting of running containers, Docker Hub makes sharing and discovering images effortless, and Docker Compose brings order to multi-container chaos.</p>
+
+<p>What makes Docker powerful isn't just the individual components, but how they work together seamlessly. You can go from a simple Dockerfile to a production-ready application running across multiple environments with just these three tools.</p>
+
+<p>The best part? You don't need to master everything at once. Start with Docker Engine to understand containers, then gradually incorporate Docker Hub for image management and Docker Compose for orchestration. Each step builds naturally on the previous one.</p>
+
+<p>As containerization continues to evolve with technologies like Kubernetes and serverless computing, these foundational Docker skills remain relevant. Whether you're building microservices, setting up CI/CD pipelines, or just trying to solve environment consistency issues, understanding the Docker ecosystem is time well invested.</p>
+
+ </div> </article> </main> <footer data-astro-cid-sz7xmlte>
+&copy; 2025 Tal Naeh. All rights reserved.
+<div class="social-links" data-astro-cid-sz7xmlte> <a href="https://linkedin.com/in/tal-naeh" target="_blank" data-astro-cid-sz7xmlte> <span class="sr-only" data-astro-cid-sz7xmlte>Follow on LinkedIn</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/twitter" data-astro-cid-sz7xmlte><path fill="currentColor" d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z" data-astro-cid-sz7xmlte></path></svg> </a> <a href="https://github.com/Tal-Naeh" target="_blank" data-astro-cid-sz7xmlte> <span class="sr-only" data-astro-cid-sz7xmlte>Visit my GitHub</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/github" data-astro-cid-sz7xmlte><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-sz7xmlte></path></svg> </a> </div> </footer>  </body></html>
