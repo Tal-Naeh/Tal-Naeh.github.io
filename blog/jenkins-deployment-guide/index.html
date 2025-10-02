@@ -15,7 +15,7 @@ Last updated on <time datetime="2025-10-03T00:00:00.000Z"> Oct 3, 2025 </time> <
 
 <h2 id="the-jenkins-deployment-problem">The Jenkins Deployment Problem</h2>
 
-<p>Jenkins is from 2011. It predates Docker, Kubernetes, and modern CI/CD patterns. This means:</p>
+<p>Jenkins was born in 2011 as Hudson. It predates Docker (2013), Kubernetes (2014), and modern CI/CD patterns. This means:</p>
 
 <ul>
 <li><strong>It's stateful as hell:</strong> Jobs, build history, plugins, credentials—all stored on disk</li>
@@ -110,7 +110,7 @@ sudo systemctl enable jenkins</code></pre>
 
 <h3 id="baremetal-the-honest-truth">The Honest Truth</h3>
 
-<p>This is how we ran Jenkins from 2015-2018. It worked fine, but upgrades were a pain. You're managing Java versions, system packages, plugin conflicts, and dealing with "works on my machine" problems when troubleshooting.</p>
+<p>This is how we ran Jenkins from 2018-2020. It worked fine, but upgrades were a pain. You're managing Java versions, system packages, plugin conflicts, and dealing with "works on my machine" problems when troubleshooting.</p>
 
 <p>The killer issue: reproducibility. When Jenkins breaks, you can't just spin up an identical copy to test fixes. You're SSH'd into prod, making changes, and hoping.</p>
 
