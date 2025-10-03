@@ -23,9 +23,9 @@ Last updated on <time datetime="2025-01-12T00:00:00.000Z"> Jan 12, 2025 </time> 
 
 <p>Except it was randomly eating requests, and we had no idea.</p>
 
-<h2 id="the-debugging-journey-from-hell">The Debugging Journey</h2>
+<h2 id="the-debugging-journey">The Debugging Journey</h2>
 
-<p>Here's how it started: sporadic customer complaints. Not many, but enough to investigate. The weird part? We could never reproduce it. Our logs showed the requests coming in, but then... nothing. No error, no timeout logged, just silence.</p>
+<p>It started with sporadic customer complaints. Not many, but enough to investigate. The weird part? We could never reproduce it. Our logs showed the requests coming in, but then... nothing. No error, no timeout logged, just silence.</p>
 
 <p>After adding way too much instrumentation, we finally caught it:</p>
 
@@ -44,9 +44,9 @@ Reality: Worker 2 had been deadlocked for 47 minutes</code></pre>
 │ Worker 4: ✅    │
 └─────────────────┘</code></pre>
 
-<h2 id="why-this-is-so-insidious">Why This is So Insidious</h2>
+<h2 id="why-this-is-hard-to-detect">Why This is Hard to Detect</h2>
 
-<p>The really frustrating part? Your monitoring won't catch this.</p>
+<p>The challenging part is that standard monitoring often won't catch this.</p>
 
 <p>Kubernetes checks if the pod is healthy, not individual workers. Your health endpoint returns 200 OK because <em>one</em> worker responds. Your CPU and memory look normal because three workers are fine. Your logs are a mess because all four workers write to the same stdout.</p>
 
@@ -185,17 +185,17 @@ async def check_all_workers():
 
 <h2 id="how-to-know-if-you-have-this-problem">How To Know If You Have This Problem</h2>
 
-<p>Run this test:</p>
+<p>To verify if this affects your setup:</p>
 
 <ol>
 <li>Find a multi-worker pod</li>
 <li>Exec into it and kill -STOP one worker process</li>
-<li>Watch your health checks still pass</li>
+<li>Observe that health checks still pass</li>
 <li>Watch some requests timeout</li>
-<li>Feel the horror wash over you</li>
+<li>Consider if this visibility gap is acceptable</li>
 </ol>
 
-<p>Or just check if you're using <code>--workers</code> anywhere. If you are, you probably have this problem.</p>
+<p>If you're using <code>--workers</code> in your deployments, you may be affected by this issue.</p>
 
 <h2 id="migration-strategy-the-realistic-version">Migration Strategy (The Realistic Version)</h2>
 
@@ -223,30 +223,29 @@ async def check_all_workers():
 <li>Document why each exception exists</li>
 </ul>
 
-<h2 id="the-numbers-after-6-months">The Numbers (After 6 Months)</h2>
+<h2 id="what-changed">What Changed</h2>
 
-<p>Here's what actually changed:</p>
+<p>The migration to single-worker pods made the most difference in operational visibility and debugging workflow.</p>
 
-<p><strong>The Good:</strong></p>
+<p><strong>What improved:</strong></p>
 <ul>
-<li>Mystery timeouts: Down ~70%</li>
-<li>Mean time to find root cause: 45 min → 10 min</li>
-<li>Debugging "I have no idea" issues: 90% reduction</li>
-<li>On-call pages at 3am: Noticeably fewer</li>
+<li>Failed workers now trigger pod restarts immediately</li>
+<li>Logs became easier to trace to specific instances</li>
+<li>Debugging time decreased noticeably</li>
+<li>The mysterious timeout issues mostly disappeared</li>
 </ul>
 
-<p><strong>The Neutral:</strong></p>
+<p><strong>What stayed the same:</strong></p>
 <ul>
-<li>Overall latency: No change (surprised us too)</li>
-<li>Infrastructure costs: Slight decrease (better autoscaling)</li>
-<li>Deployment time: Slightly slower (more pods to roll)</li>
+<li>Overall application performance and latency</li>
+<li>Total resource usage (with proper limits configured)</li>
 </ul>
 
-<p><strong>The Annoying:</strong></p>
+<p><strong>What required adjustment:</strong></p>
 <ul>
-<li>More pods to manage (but kubectl handles it)</li>
-<li>Had to update our resource limits everywhere</li>
-<li>Some pushback from the "but it's always been this way" crowd</li>
+<li>Resource limits needed recalculation per pod</li>
+<li>Deployment configurations across all services</li>
+<li>Team's mental model of how pods scale</li>
 </ul>
 
 <h2 id="what-this-taught-us">What This Taught Us</h2>
@@ -267,9 +266,9 @@ async def check_all_workers():
 <li>Your future self will thank you when debugging at 3am</li>
 </ul>
 
-<p>Look, I know this sounds like unnecessary work. I thought the same thing. But after seeing how much easier operations became, I'm convinced: in Kubernetes, clarity beats efficiency every time.</p>
+<p>I know this approach might seem like extra work initially. We had the same hesitation. But after experiencing the operational improvements, we found that in Kubernetes, visibility and clear failure modes often matter more than minimal resource usage.</p>
 
-<p>Try it with one service. What's the worst that could happen? You'll revert it and call me an idiot in the comments. But I'm betting you won't.</p>
+<p>Consider trying it with one non-critical service first. You can always revert if it doesn't work for your use case.</p>
 
 <hr>
 
