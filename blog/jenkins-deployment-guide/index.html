@@ -324,14 +324,12 @@ spec:
 <li>You have a dedicated platform team</li>
 </ul>
 
-<hr>
-
-<h2 id="what-we-actually-run">What We Actually Run</h2>
+<h3 id="what-we-actually-run">What We Actually Run</h3>
 
 <p>After trying everything, here's our current setup:</p>
 
 <ul>
-<li><strong>Jenkins controller:</strong> Docker Compose on a dedicated EC2 instance (t3.xlarge)</li>
+<li><strong>Jenkins controller:</strong> Docker Compose on a dedicated EC2 instance</li>
 <li><strong>Jenkins agents:</strong> Kubernetes pods that spin up per-build</li>
 <li><strong>Backup:</strong> Daily snapshots of the jenkins_home volume to S3</li>
 <li><strong>Monitoring:</strong> Prometheus exports + PagerDuty for alerts</li>
