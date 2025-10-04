@@ -1,28 +1,35 @@
 <!DOCTYPE html><html lang="en" data-astro-cid-bvzihdzo> <head><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-ECGK9Y42TF"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-ECGK9Y42TF');</script><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="DevOps Out Loud" href="https://tal-naeh.github.io/rss.xml"><!-- Font preloads --><link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://tal-naeh.github.io/blog/understanding-jenkins/"><!-- Primary Meta Tags --><title>Understanding Jenkins - Simplifying the Complexities</title><meta name="title" content="Understanding Jenkins - Simplifying the Complexities"><meta name="description" content="A practical guide to understanding Jenkins, CI/CD fundamentals, pipelines, testing, security, and useful tools."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://tal-naeh.github.io/blog/understanding-jenkins/"><meta property="og:title" content="Understanding Jenkins - Simplifying the Complexities"><meta property="og:description" content="A practical guide to understanding Jenkins, CI/CD fundamentals, pipelines, testing, security, and useful tools."><meta property="og:image" content="https://www.jenkins.io/images/logos/jenkins/jenkins.svg"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://tal-naeh.github.io/blog/understanding-jenkins/"><meta property="twitter:title" content="Understanding Jenkins - Simplifying the Complexities"><meta property="twitter:description" content="A practical guide to understanding Jenkins, CI/CD fundamentals, pipelines, testing, security, and useful tools."><meta property="twitter:image" content="https://www.jenkins.io/images/logos/jenkins/jenkins.svg"><style>:root{--accent: #2337ff;--accent-dark: #000d8a;--black: 15, 18, 25;--gray: 96, 115, 159;--gray-light: 229, 233, 240;--gray-dark: 34, 41, 57;--gray-gradient: rgba(var(--gray-light), 50%), #fff;--box-shadow: 0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%), 0 16px 32px rgba(var(--gray), 33%)}@font-face{font-family:Atkinson;src:url(/fonts/atkinson-regular.woff) format("woff");font-weight:400;font-style:normal;font-display:swap}@font-face{font-family:Atkinson;src:url(/fonts/atkinson-bold.woff) format("woff");font-weight:700;font-style:normal;font-display:swap}body{font-family:Atkinson,sans-serif;margin:0;padding:0;text-align:left;background:linear-gradient(var(--gray-gradient)) no-repeat;background-size:100% 600px;word-wrap:break-word;overflow-wrap:break-word;color:rgb(var(--gray-dark));font-size:20px;line-height:1.7}main{width:720px;max-width:calc(100% - 2em);margin:auto;padding:3em 1em}h1,h2,h3,h4,h5,h6{margin:0 0 .5rem;color:rgb(var(--black));line-height:1.2}h1{font-size:3.052em}h2{font-size:2.441em}h3{font-size:1.953em}h4{font-size:1.563em}h5{font-size:1.25em}strong,b{font-weight:700}a,a:hover{color:var(--accent)}p{margin-bottom:1em}.prose p{margin-bottom:2em}textarea{width:100%;font-size:16px}input{font-size:16px}table{width:100%}img{max-width:100%;height:auto;border-radius:8px}code{padding:2px 5px;background-color:rgb(var(--gray-light));border-radius:2px}pre{padding:1.5em;border-radius:8px}pre>code{all:unset}blockquote{border-left:4px solid var(--accent);padding:0 0 0 20px;margin:0;font-size:1.333em}hr{border:none;border-top:1px solid rgb(var(--gray-light))}@media (max-width: 720px){body{font-size:18px}main{padding:1em}}.sr-only{border:0;padding:0;margin:0;position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px 1px 1px 1px);clip:rect(1px,1px,1px,1px);clip-path:inset(50%);white-space:nowrap}a[data-astro-cid-eimmu3lg]{display:inline-block;text-decoration:none}a[data-astro-cid-eimmu3lg].active{font-weight:bolder;text-decoration:underline}header[data-astro-cid-3ef6ksr2]{margin:0;padding:0 1em;background:#fff;box-shadow:0 2px 8px rgba(var(--black),5%)}h2[data-astro-cid-3ef6ksr2]{margin:0;font-size:1em}h2[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2],h2[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2].active{text-decoration:none}nav[data-astro-cid-3ef6ksr2]{display:flex;align-items:center;justify-content:space-between}nav[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2]{padding:1em .5em;color:var(--black);border-bottom:4px solid transparent;text-decoration:none}nav[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2].active{text-decoration:none;border-bottom-color:var(--accent)}.social-links[data-astro-cid-3ef6ksr2],.social-links[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2]{display:flex}@media (max-width: 720px){.social-links[data-astro-cid-3ef6ksr2]{display:none}}footer[data-astro-cid-sz7xmlte]{padding:2em 1em 6em;background:linear-gradient(var(--gray-gradient)) no-repeat;color:rgb(var(--gray));text-align:center}.social-links[data-astro-cid-sz7xmlte]{display:flex;justify-content:center;gap:1em;margin-top:1em}.social-links[data-astro-cid-sz7xmlte] a[data-astro-cid-sz7xmlte]{text-decoration:none;color:rgb(var(--gray))}.social-links[data-astro-cid-sz7xmlte] a[data-astro-cid-sz7xmlte]:hover{color:rgb(var(--gray-dark))}
 main[data-astro-cid-bvzihdzo]{width:calc(100% - 2em);max-width:100%;margin:0}.hero-image[data-astro-cid-bvzihdzo]{width:100%}.hero-image[data-astro-cid-bvzihdzo] img[data-astro-cid-bvzihdzo]{display:block;margin:0 auto;border-radius:12px;box-shadow:var(--box-shadow)}.prose[data-astro-cid-bvzihdzo]{width:720px;max-width:calc(100% - 2em);margin:auto;padding:1em;color:rgb(var(--gray-dark))}.title[data-astro-cid-bvzihdzo]{margin-bottom:1em;padding:1em 0;text-align:center;line-height:1}.title[data-astro-cid-bvzihdzo] h1[data-astro-cid-bvzihdzo]{margin:0 0 .5em}.date[data-astro-cid-bvzihdzo]{margin-bottom:.5em;color:rgb(var(--gray))}.last-updated-on[data-astro-cid-bvzihdzo]{font-style:italic}
 </style></head> <body data-astro-cid-bvzihdzo> <header data-astro-cid-3ef6ksr2> <nav data-astro-cid-3ef6ksr2> <h2 data-astro-cid-3ef6ksr2><a href="/" data-astro-cid-3ef6ksr2>DevOps Out Loud</a></h2> <div class="internal-links" data-astro-cid-3ef6ksr2> <a href="/" data-astro-cid-3ef6ksr2="true" data-astro-cid-eimmu3lg> Home </a>  <a href="/blog" class="active" data-astro-cid-3ef6ksr2="true" data-astro-cid-eimmu3lg> Blog </a>  <a href="/about" data-astro-cid-3ef6ksr2="true" data-astro-cid-eimmu3lg> About </a>  </div> <div class="social-links" data-astro-cid-3ef6ksr2> <a href="https://linkedin.com/in/tal-naeh" target="_blank" data-astro-cid-3ef6ksr2> <span class="sr-only" data-astro-cid-3ef6ksr2>Follow on LinkedIn</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-3ef6ksr2><path fill="currentColor" d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z" data-astro-cid-3ef6ksr2></path></svg> </a> <a href="https://github.com/Tal-Naeh" target="_blank" data-astro-cid-3ef6ksr2> <span class="sr-only" data-astro-cid-3ef6ksr2>Visit my GitHub</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-3ef6ksr2><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-3ef6ksr2></path></svg> </a> </div> </nav> </header>  <main data-astro-cid-bvzihdzo> <article data-astro-cid-bvzihdzo> <div class="hero-image" data-astro-cid-bvzihdzo> <img src="https://www.jenkins.io/images/logos/jenkins/jenkins.svg" alt style="max-width: 100%; height: auto;" data-astro-cid-bvzihdzo> </div> <div class="prose" data-astro-cid-bvzihdzo> <div class="title" data-astro-cid-bvzihdzo> <div class="date" data-astro-cid-bvzihdzo> <time datetime="2025-06-03T00:00:00.000Z"> Jun 3, 2025 </time> <div class="last-updated-on" data-astro-cid-bvzihdzo>
-Last updated on <time datetime="2025-06-03T00:00:00.000Z"> Jun 3, 2025 </time> </div> </div> <h1 data-astro-cid-bvzihdzo>Understanding Jenkins - Simplifying the Complexities</h1> <hr data-astro-cid-bvzihdzo> </div>  <p>Jenkins remains the backbone of CI/CD infrastructure for many production environments. Despite newer alternatives, its flexibility and extensive plugin ecosystem make it a pragmatic choice for complex automation workflows.</p>
-<p>This guide covers Jenkins architecture, pipeline implementation patterns, and production-ready integrations for testing, security scanning, and deployment automation.</p>
+Last updated on <time datetime="2025-06-03T00:00:00.000Z"> Jun 3, 2025 </time> </div> </div> <h1 data-astro-cid-bvzihdzo>Understanding Jenkins - Simplifying the Complexities</h1> <hr data-astro-cid-bvzihdzo> </div>  <p>Jenkins powers CI/CD for organizations ranging from startups to Fortune 500 companies. While newer tools like GitHub Actions and GitLab CI have emerged, Jenkins' extensibility and control over execution environments make it irreplaceable for complex, multi-platform builds and regulated industries requiring on-premise automation.</p>
+<p>This guide provides actionable patterns for building robust Jenkins pipelines—from basic CI validation to production deployment strategies. Whether you're setting up your first pipeline or optimizing enterprise-scale automation, you'll find practical implementations and lessons learned from production environments.</p>
 <hr>
 <h2 id="what-is-jenkins">What is Jenkins?</h2>
 <p>Jenkins is an <strong>open-source automation server</strong> that orchestrates the build, test, and deployment phases of software delivery. It executes workflows defined as code, providing repeatable and auditable automation across the development lifecycle.</p>
 <hr>
 <h2 id="continuous-integration-ci">Continuous Integration (CI)</h2>
-<p><strong>CI</strong> enforces early integration of code changes through automated validation. Jenkins triggers builds on repository events (commits, pull requests) and executes test suites, static analysis, and compilation steps to verify changes before merge.</p>
-<h3 id="unit-testing">Unit Testing</h3>
-<p>Automated test execution is fundamental to CI pipelines. Jenkins integrates with standard testing frameworks across language ecosystems:</p>
+<p><strong>CI</strong> catches integration issues early by validating every code change against the mainline. Jenkins monitors repository webhooks and triggers automated builds that run tests, static analysis, and security scans—preventing broken code from reaching production.</p>
+<h3 id="unit-testing">Testing Strategy</h3>
+<p>A mature CI pipeline validates code at multiple levels:</p>
 <ul>
-<li>Java (JUnit, TestNG)</li>
-<li>Python (pytest, unittest)</li>
-<li>JavaScript (Jest, Mocha)</li>
+<li><strong>Unit Tests</strong> – Fast, isolated tests (JUnit, pytest, Jest) that validate individual components</li>
+<li><strong>Integration Tests</strong> – Verify interactions between services, databases, and external APIs</li>
+<li><strong>Contract Tests</strong> – Ensure API compatibility between microservices (Pact, Spring Cloud Contract)</li>
 </ul>
-<p>Test results are aggregated and visualized through plugins like <strong>JUnit Plugin</strong> and <strong>Test Results Analyzer</strong>, providing immediate feedback on test coverage and failures.</p>
-<h3 id="code-quality--linting">Code Quality &#x26; Linting</h3>
-<p>Static analysis tooling enforces code standards and identifies defects early:</p>
+<p><strong>Key Pattern:</strong> Use the <strong>JUnit Plugin</strong> to publish test results and track trends over time. Configure build failures on test regression—if tests passed in the last build but fail now, the build should fail immediately to prevent bad commits from accumulating.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="groovy"><code><span class="line"><span style="color:#E1E4E8">post {</span></span>
+<span class="line"><span style="color:#E1E4E8">  always {</span></span>
+<span class="line"><span style="color:#E1E4E8">    junit </span><span style="color:#9ECBFF">'**/target/surefire-reports/*.xml'</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="code-quality--linting">Static Analysis and Quality Gates</h3>
+<p>Integrate <strong>SonarQube</strong> to enforce quality standards beyond basic linting. SonarQube provides:</p>
 <ul>
-<li><strong>ESLint / Flake8 / Pylint</strong> — for code style</li>
-<li><strong>SonarQube</strong> — for advanced static code analysis and code smells</li>
+<li><strong>Code Coverage Tracking</strong> – Fail builds if coverage drops below threshold (e.g., 80%)</li>
+<li><strong>Technical Debt Metrics</strong> – Quantify maintenance burden from code smells and duplications</li>
+<li><strong>Security Hotspots</strong> – Detect hardcoded credentials, SQL injection risks, and vulnerable dependencies</li>
 </ul>
+<p><strong>Production Tip:</strong> Set quality gates to block merges when critical issues are introduced. Configure your pipeline to fail if new code introduces blocker/critical severity issues, but allow existing tech debt to be addressed incrementally.</p>
 <h3 id="popular-ci-tools-and-integrations">Popular CI Tools and Integrations</h3>
 <ul>
 <li><strong>GitHub Actions</strong> – Lightweight CI</li>
@@ -33,27 +40,43 @@ Last updated on <time datetime="2025-06-03T00:00:00.000Z"> Jun 3, 2025 </time> <
 </ul>
 <hr>
 <h2 id="continuous-delivery-cd">Continuous Delivery (CD)</h2>
-<p><strong>CD</strong> automates deployment workflows, ensuring validated code reaches target environments consistently. After passing CI validation, artifacts are promoted through staging and production environments with minimal manual intervention.</p>
-<h3 id="useful-cd-tools-with-jenkins">Useful CD Tools with Jenkins</h3>
+<p><strong>CD</strong> automates the release process while maintaining control over production deployments. The goal: keep your main branch in a deployable state at all times, with automated promotion through environments.</p>
+<h3 id="deployment-patterns">Deployment Patterns</h3>
+<p><strong>Blue-Green Deployments:</strong> Run two identical production environments (blue and green). Deploy to the inactive environment, validate, then switch traffic. Instant rollback by switching back.</p>
+<p><strong>Canary Releases:</strong> Deploy to a small subset of users (5-10%) before full rollout. Monitor error rates and latency—automatically rollback if metrics degrade.</p>
+<p><strong>Feature Flags:</strong> Deploy code with features hidden behind toggles. Enable features for specific users or environments without redeploying.</p>
+<h3 id="jenkins-cd-integrations">Jenkins CD Integrations</h3>
 <ul>
-<li><strong>Ansible</strong> – Automate infrastructure provisioning</li>
-<li><strong>Helm</strong> – Package and deploy Kubernetes apps</li>
-<li><strong>ArgoCD</strong> – GitOps-based Kubernetes CD</li>
-<li><strong>Terraform</strong> – Automate infrastructure as code</li>
-<li><strong>Slack Notifications</strong> – Notify teams of build/deploy status</li>
+<li><strong>Kubernetes + Helm</strong> – Declare application state, let Jenkins apply versioned charts</li>
+<li><strong>ArgoCD</strong> – GitOps pattern: Jenkins builds images, ArgoCD watches Git and deploys automatically</li>
+<li><strong>Terraform</strong> – Provision infrastructure before application deployment (databases, networks, load balancers)</li>
+<li><strong>Ansible</strong> – Configuration management for VM-based deployments</li>
 </ul>
+<p><strong>Real-World Pattern:</strong> Use Jenkins for build/test, push artifacts to registry, then trigger ArgoCD to deploy from Git. This separates build automation from deployment state management.</p>
 <hr>
-<h2 id="security-scanning-with-trivy">Security Scanning with Trivy</h2>
-<p><a href="https://aquasecurity.github.io/trivy/">Trivy</a> provides vulnerability detection for container images, Infrastructure-as-Code, and dependencies. Integration into Jenkins pipelines enables shift-left security by scanning:</p>
+<h2 id="security-scanning-with-trivy">Shift-Left Security with Trivy</h2>
+<p>Security scanning must happen before deployment, not after. <a href="https://aquasecurity.github.io/trivy/">Trivy</a> scans container images, IaC templates, and dependency manifests for known CVEs.</p>
+<h3 id="why-trivy">Why Trivy Over Alternatives?</h3>
 <ul>
-<li>Docker images</li>
-<li>SBOMs</li>
-<li>Kubernetes manifests</li>
-<li>Terraform and Helm charts</li>
+<li><strong>Comprehensive Coverage</strong> – Scans OS packages, application dependencies, and IaC misconfigurations</li>
+<li><strong>Fast</strong> – Parallel scanning with cached vulnerability databases</li>
+<li><strong>CI-Friendly</strong> – Exit codes, JSON output, and severity filtering designed for pipeline integration</li>
 </ul>
-<h3 id="example-usage-in-pipeline">Pipeline Integration:</h3>
-<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">trivy</span><span style="color:#9ECBFF"> image</span><span style="color:#9ECBFF"> my-app:latest</span><span style="color:#79B8FF"> --exit-code</span><span style="color:#79B8FF"> 1</span><span style="color:#79B8FF"> --severity</span><span style="color:#9ECBFF"> HIGH,CRITICAL</span></span></code></pre>
-<p>Configuring <code>--exit-code 1</code> fails the build on critical findings, preventing vulnerable images from reaching production.</p>
+<h3 id="example-usage-in-pipeline">Production Implementation:</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="groovy"><code><span class="line"><span style="color:#E1E4E8">stage(</span><span style="color:#9ECBFF">'Security Scan'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  steps {</span></span>
+<span class="line"><span style="color:#E1E4E8">    script {</span></span>
+<span class="line"><span style="color:#E1E4E8">      </span><span style="color:#6A737D">// Scan for HIGH and CRITICAL vulnerabilities</span></span>
+<span class="line"><span style="color:#E1E4E8">      sh </span><span style="color:#9ECBFF">'''</span></span>
+<span class="line"><span style="color:#9ECBFF">        trivy image --exit-code 1 --severity HIGH,CRITICAL \</span></span>
+<span class="line"><span style="color:#9ECBFF">          --format json --output trivy-report.json \</span></span>
+<span class="line"><span style="color:#9ECBFF">          my-app:${BUILD_NUMBER}</span></span>
+<span class="line"><span style="color:#9ECBFF">      '''</span></span>
+<span class="line"><span style="color:#E1E4E8">      archiveArtifacts </span><span style="color:#9ECBFF">'trivy-report.json'</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>Critical Detail:</strong> Use <code>--exit-code 1</code> to fail the build on vulnerabilities. Archive the JSON report for audit trails. In highly regulated environments, integrate this with vulnerability management platforms (Jira, ServiceNow) to auto-create tickets for remediation.</p>
 <hr>
 <h2 id="jenkins-pipelines">Jenkins Pipelines</h2>
 <p>Jenkins Pipelines codify CI/CD workflows in version-controlled Groovy DSL. Declarative pipelines provide structured syntax for common patterns, while scripted pipelines offer full programmatic control for complex logic.</p>
@@ -131,14 +154,43 @@ Last updated on <time datetime="2025-06-03T00:00:00.000Z"> Jun 3, 2025 </time> <
 <li><strong>Monitor</strong> – Use Blue Ocean, email/slack notifications, test reports.</li>
 </ol>
 <hr>
-<h2 id="production-considerations">Production Considerations</h2>
-<p>Effective Jenkins deployments require attention to:</p>
+<h2 id="production-considerations">Scaling Jenkins in Production</h2>
+<h3 id="agent-architecture">Agent Architecture</h3>
+<p><strong>Static vs. Ephemeral Agents:</strong></p>
 <ul>
-<li><strong>Agent Management</strong> – Distribute builds across ephemeral or static agents to prevent resource contention</li>
-<li><strong>Pipeline Optimization</strong> – Cache dependencies, parallelize independent stages, and fail fast on critical errors</li>
-<li><strong>Security Hardening</strong> – Implement credential management via Jenkins Credentials Plugin, enforce RBAC, and audit pipeline changes</li>
-<li><strong>Observability</strong> – Integrate with monitoring systems (Prometheus, Datadog) to track build performance and failure patterns</li>
+<li><strong>Static Agents</strong> – VMs or physical machines that persist between builds. Use for builds requiring expensive setup (large dependency caches, specialized hardware)</li>
+<li><strong>Ephemeral Agents</strong> – Kubernetes pods or Docker containers that spin up per build. Guarantees clean environment, scales horizontally, prevents configuration drift</li>
 </ul>
-<p>Jenkins scales from single-team automation to enterprise-grade CI/CD when configured with production reliability in mind. Start with core validation (tests, linting), then layer in security scanning and deployment automation as your pipeline matures.</p>  </div> </article> </main> <footer data-astro-cid-sz7xmlte>
+<p><strong>Best Practice:</strong> Use Kubernetes-based ephemeral agents for most builds. Reserve static agents for builds that genuinely benefit from warm caches (Android/iOS builds, large monorepos).</p>
+<h3 id="pipeline-performance">Pipeline Performance</h3>
+<p>Slow pipelines kill productivity. Optimize with:</p>
+<ul>
+<li><strong>Parallel Stages</strong> – Run independent tests concurrently (unit tests, linters, security scans)</li>
+<li><strong>Dependency Caching</strong> – Cache <code>node_modules</code>, <code>.m2</code>, pip packages between builds</li>
+<li><strong>Fail Fast</strong> – Run fastest validations first (linting before integration tests)</li>
+<li><strong>Stash/Unstash</strong> – Share artifacts between stages without rebuilding</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="groovy"><code><span class="line"><span style="color:#E1E4E8">stage(</span><span style="color:#9ECBFF">'Parallel Tests'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  parallel {</span></span>
+<span class="line"><span style="color:#E1E4E8">    stage(</span><span style="color:#9ECBFF">'Unit'</span><span style="color:#E1E4E8">) { steps { sh </span><span style="color:#9ECBFF">'npm test:unit'</span><span style="color:#E1E4E8"> } }</span></span>
+<span class="line"><span style="color:#E1E4E8">    stage(</span><span style="color:#9ECBFF">'Lint'</span><span style="color:#E1E4E8">) { steps { sh </span><span style="color:#9ECBFF">'npm run lint'</span><span style="color:#E1E4E8"> } }</span></span>
+<span class="line"><span style="color:#E1E4E8">    stage(</span><span style="color:#9ECBFF">'Security'</span><span style="color:#E1E4E8">) { steps { sh </span><span style="color:#9ECBFF">'npm audit'</span><span style="color:#E1E4E8"> } }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="security-hardening">Security Hardening</h3>
+<ul>
+<li><strong>Credentials Management</strong> – Never hardcode secrets. Use Jenkins Credentials Plugin with HashiCorp Vault or AWS Secrets Manager</li>
+<li><strong>RBAC</strong> – Implement role-based access control. Developers shouldn't access production deployment jobs</li>
+<li><strong>Audit Logging</strong> – Track who triggered builds, what changed in pipelines, which credentials were accessed</li>
+<li><strong>Plugin Security</strong> – Regularly update plugins. Outdated plugins are the #1 Jenkins security risk</li>
+</ul>
+<h3 id="monitoring-and-observability">Monitoring and Observability</h3>
+<p>Instrument your Jenkins instance to detect issues before they impact teams:</p>
+<ul>
+<li><strong>Prometheus Metrics</strong> – Track build duration, queue time, agent availability</li>
+<li><strong>Log Aggregation</strong> – Ship build logs to ELK/Splunk for search and analysis</li>
+<li><strong>Alerting</strong> – Notify on-call when critical pipelines fail or build queue exceeds threshold</li>
+</ul>
+<p><strong>Key Metric:</strong> Track your pipeline's <strong>lead time</strong> (commit to production). If it exceeds 30 minutes, investigate bottlenecks in test execution or deployment automation.</p>  </div> </article> </main> <footer data-astro-cid-sz7xmlte>
 &copy; 2025 al Naeh. All rights reserved.
 <div class="social-links" data-astro-cid-sz7xmlte> <a href="https://linkedin.com/in/tal-naeh" target="_blank" data-astro-cid-sz7xmlte> <span class="sr-only" data-astro-cid-sz7xmlte>Follow on LinkedIn</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/twitter" data-astro-cid-sz7xmlte><path fill="currentColor" d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z" data-astro-cid-sz7xmlte></path></svg> </a> <a href="https://github.com/Tal-Naeh" target="_blank" data-astro-cid-sz7xmlte> <span class="sr-only" data-astro-cid-sz7xmlte>Visit my GitHub</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/github" data-astro-cid-sz7xmlte><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-sz7xmlte></path></svg> </a> </div> </footer>  </body></html>

@@ -183,7 +183,7 @@ spec:
 
 <h3 id="k8s-why-i-actually-recommend-this">Why I Actually Recommend This (Sometimes)</h3>
 
-<p>We moved to this model when our build queue started backing up. With Kubernetes agents, we can run 20 builds simultaneously, each in its own pod with exactly the resources it needs. When builds finish, pods disappear. No idle VMs sitting around.</p>
+<p>We moved to this model when our build queue started backing up. With Kubernetes agents, build concurrency scales with available cluster resources—each build gets its own pod with allocated CPU/memory limits. When builds finish, pods disappear and resources are freed.</p>
 
 <p>The Jenkins Kubernetes plugin works surprisingly well. Configure it once, and Jenkins automatically provisions pods for each build:</p>
 
@@ -277,7 +277,7 @@ spec:
 <p><strong>Pros:</strong> Scales infinitely, no configuration drift, cost-efficient<br>
 <strong>Cons:</strong> Slower startup, requires good image management</p>
 
-<p>Now we run 0 permanent agents. Every build gets a fresh pod that's destroyed when done. Our AWS bill dropped 40% and builds are more reliable because there's no state lingering between builds.</p>
+<p>Now we run 0 permanent agents. Every build gets a fresh pod that's destroyed when done. Builds are more reliable because there's no state lingering between builds, and we only pay for compute during active builds rather than maintaining idle capacity.</p>
 
 <h3 id="agent-my-recommendation">My Recommendation</h3>
 
@@ -367,6 +367,267 @@ spec:
 <h3 id="mistakes-mistake-4-not-using-configuration-as-code">Mistake 4: Not Using Configuration as Code</h3>
 
 <p>We configured Jenkins via the UI for years. Every time we rebuilt it, we had to remember dozens of settings. Now we use the <a href="https://plugins.jenkins.io/configuration-as-code/">Configuration as Code plugin</a> and Jenkins configs live in Git. Game changer.</p>
+
+<hr>
+
+<h2 id="security-considerations-for-production">Security Considerations for Production</h2>
+
+<p>Jenkins security is often an afterthought until an incident happens. Here's what matters in production environments.</p>
+
+<h3 id="security-plugin-isolation">Plugin Dependency Isolation</h3>
+
+<p>Jenkins plugins run in the same JVM as the controller and share the classpath. This creates dependency conflicts and security risks:</p>
+
+<ul>
+<li><strong>Version Conflicts:</strong> Plugin A needs Jackson 2.12, Plugin B needs 2.15. One breaks.</li>
+<li><strong>Privilege Escalation:</strong> Malicious plugins can access credentials, modify jobs, or execute arbitrary code</li>
+<li><strong>Supply Chain Attacks:</strong> Compromised plugin updates can affect all Jenkins instances automatically</li>
+</ul>
+
+<p><strong>Mitigation Strategies:</strong></p>
+
+<ul>
+<li><strong>Pin Plugin Versions:</strong> Don't auto-update plugins. Test updates in non-production first</li>
+<li><strong>Audit Installed Plugins:</strong> Remove unused plugins. Each one is a potential vulnerability</li>
+<li><strong>Use Plugin Bill of Materials:</strong> Jenkins publishes tested plugin version combinations</li>
+<li><strong>Monitor Plugin Security Advisories:</strong> Subscribe to jenkins-advisories mailing list</li>
+</ul>
+
+<h3 id="security-build-job-sandboxing">Build Job Sandboxing</h3>
+
+<p>By default, Jenkins jobs run with significant access. In Docker or Kubernetes deployments, jobs can often:</p>
+
+<ul>
+<li>Access the Docker socket (equivalent to root on host)</li>
+<li>Read secrets from environment variables or mounted volumes</li>
+<li>Network access to internal services</li>
+<li>Consume unlimited CPU/memory</li>
+</ul>
+
+<p><strong>Implement Defense in Depth:</strong></p>
+
+<pre><code class="language-yaml"># Kubernetes Pod Security Standards
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jenkins-agent
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: agent
+    image: jenkins/inbound-agent:latest
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+    resources:
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+      requests:
+        cpu: "500m"
+        memory: "1Gi"</code></pre>
+
+<p><strong>Additional Sandboxing Techniques:</strong></p>
+
+<ul>
+<li><strong>Network Policies:</strong> Restrict agent egress to only required services (artifact repos, source control)</li>
+<li><strong>Separate Namespaces:</strong> Isolate Jenkins agents by team or sensitivity level</li>
+<li><strong>gVisor or Kata Containers:</strong> For high-security environments, use VM-isolated containers</li>
+<li><strong>Resource Quotas:</strong> Prevent single jobs from consuming entire cluster</li>
+</ul>
+
+<h3 id="security-secrets-management">Secrets and Configuration Security</h3>
+
+<p>Jenkins manages credentials for source control, cloud providers, databases, and deployment targets. Poor secrets management is the most common Jenkins security failure.</p>
+
+<p><strong>Never Do This:</strong></p>
+
+<ul>
+<li>Store secrets in job configurations or Jenkinsfiles</li>
+<li>Echo credentials in build logs</li>
+<li>Use the default Jenkins credentials store without encryption</li>
+<li>Share admin credentials across teams</li>
+</ul>
+
+<p><strong>Production-Grade Secrets Management:</strong></p>
+
+<pre><code class="language-groovy">// Use external secret managers
+pipeline {
+  agent any
+  environment {
+    AWS_CREDENTIALS = credentials('aws-prod-deployer')
+    // Fetches from HashiCorp Vault via plugin
+    DB_PASSWORD = vault(path: 'secret/database', key: 'password')
+  }
+  stages {
+    stage('Deploy') {
+      steps {
+        // Credentials are masked in logs
+        sh '''
+          aws s3 cp build.zip s3://artifacts/
+        '''
+      }
+    }
+  }
+}</code></pre>
+
+<p><strong>Recommended Secret Backends:</strong></p>
+
+<ul>
+<li><strong>HashiCorp Vault:</strong> Industry standard, audit logs, dynamic secrets, credential rotation</li>
+<li><strong>AWS Secrets Manager:</strong> Native AWS integration, automatic rotation</li>
+<li><strong>Azure Key Vault:</strong> For Azure-centric environments</li>
+<li><strong>Kubernetes Secrets:</strong> Acceptable for K8s deployments, but use External Secrets Operator</li>
+</ul>
+
+<p><strong>Critical: Enable Credentials Masking</strong></p>
+
+<p>Install the "Credentials Binding Plugin" and "Mask Passwords Plugin" to prevent accidental credential exposure in logs.</p>
+
+<h3 id="security-network-segmentation">Network Policies and Segmentation</h3>
+
+<p>In Kubernetes deployments, Jenkins often has excessive network access. Apply principle of least privilege:</p>
+
+<pre><code class="language-yaml"># Restrict Jenkins agent network access
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: jenkins-agent-policy
+  namespace: jenkins-agents
+spec:
+  podSelector:
+    matchLabels:
+      app: jenkins-agent
+  policyTypes:
+  - Egress
+  - Ingress
+  ingress:
+  # Allow Jenkins controller to communicate with agents
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: jenkins
+    ports:
+    - protocol: TCP
+      port: 50000
+  egress:
+  # Allow DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+  # Allow HTTPS to internet (for downloading dependencies)
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 443
+  # Block access to metadata service (prevent credential theft)
+  - to:
+    - podSelector: {}
+    ports:
+    - protocol: TCP
+      port: 80
+    except:
+    - cidr: 169.254.169.254/32</code></pre>
+
+<p><strong>Additional Network Controls:</strong></p>
+
+<ul>
+<li><strong>Firewall Rules:</strong> Restrict Jenkins controller ingress to VPN or corporate network</li>
+<li><strong>Service Mesh:</strong> Use Istio/Linkerd to enforce mTLS between Jenkins and agents</li>
+<li><strong>Egress Filtering:</strong> Prevent data exfiltration by blocking unexpected outbound connections</li>
+</ul>
+
+<h3 id="security-rbac-and-authorization">Role-Based Access Control</h3>
+
+<p>Jenkins' default authorization model is too permissive for organizations. Implement granular RBAC:</p>
+
+<pre><code class="language-yaml"># Configuration as Code - Matrix Authorization
+jenkins:
+  authorizationStrategy:
+    projectMatrix:
+      permissions:
+        # Admins
+        - "Overall/Administer:jenkins-admins"
+
+        # Developers can view and build
+        - "Job/Build:developers"
+        - "Job/Read:developers"
+        - "Job/Cancel:developers"
+
+        # Read-only for auditors
+        - "Overall/Read:auditors"
+        - "Job/Read:auditors"
+
+        # Block anonymous access
+        - "Overall/Read:authenticated"</code></pre>
+
+<p><strong>Best Practices:</strong></p>
+
+<ul>
+<li><strong>Folder-Based Authorization:</strong> Use Jenkins folders to scope permissions by team/project</li>
+<li><strong>Audit Logging:</strong> Enable audit trail plugin to track who changed what</li>
+<li><strong>SSO Integration:</strong> Use SAML/OIDC for centralized authentication (LDAP is acceptable)</li>
+<li><strong>Principle of Least Privilege:</strong> Developers shouldn't access production deployment jobs</li>
+</ul>
+
+<h3 id="security-docker-socket-alternatives">Avoiding Docker Socket Mount</h3>
+
+<p>Mounting <code>/var/run/docker.sock</code> is convenient but dangerous—it grants root-equivalent access to the host. Alternatives:</p>
+
+<p><strong>1. Docker-outside-of-Docker (DooD) with Rootless Docker:</strong></p>
+
+<pre><code class="language-bash"># Run Docker daemon in rootless mode
+dockerd-rootless-setuptool.sh install</code></pre>
+
+<p><strong>2. Kaniko for Container Builds:</strong></p>
+
+<pre><code class="language-groovy">// Build containers without Docker daemon
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+        apiVersion: v1
+        kind: Pod
+        spec:
+          containers:
+          - name: kaniko
+            image: gcr.io/kaniko-project/executor:latest
+            command: ["/busybox/cat"]
+            tty: true
+      '''
+    }
+  }
+  stages {
+    stage('Build Image') {
+      steps {
+        container('kaniko') {
+          sh '''
+            /kaniko/executor \\
+              --context=dir://$WORKSPACE \\
+              --destination=myrepo/myapp:${BUILD_NUMBER}
+          '''
+        }
+      }
+    }
+  }
+}</code></pre>
+
+<p><strong>3. Buildah or Podman:</strong></p>
+
+<p>Rootless container builds without privileged access.</p>
 
 <hr>
 
