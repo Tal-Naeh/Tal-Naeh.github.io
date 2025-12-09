@@ -1,0 +1,565 @@
+<!DOCTYPE html><html lang="en" data-astro-cid-bvzihdzo> <head><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-ECGK9Y42TF"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-ECGK9Y42TF');</script><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/DOL.png"><!-- Security Headers --><meta http-equiv="X-Frame-Options" content="DENY"><meta http-equiv="X-Content-Type-Options" content="nosniff"><meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"><meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://media.licdn.com https://www.jenkins.io https://raw.githubusercontent.com https://logo.svgcdn.com https://www.docker.com https://git-scm.com; font-src 'self'; connect-src 'self' https://www.google-analytics.com; frame-ancestors 'none'"><link rel="sitemap" href="/sitemap-index.xml"><link rel="alternate" type="application/rss+xml" title="DevOps Out Loud" href="https://tal-naeh.github.io/rss.xml"><!-- Font preloads --><link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://tal-naeh.github.io/blog/jenkins-dns-bottleneck/"><!-- Primary Meta Tags --><title>How DNS Resolution Became Our CI/CD Bottleneck at 600+ Daily Builds</title><meta name="title" content="How DNS Resolution Became Our CI/CD Bottleneck at 600+ Daily Builds"><meta name="description" content="When Jenkins scaled from 50 to 600+ builds per day, DNS resolution failures brought everything down. Here's how Linux networking knowledge saved us."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://tal-naeh.github.io/blog/jenkins-dns-bottleneck/"><meta property="og:title" content="How DNS Resolution Became Our CI/CD Bottleneck at 600+ Daily Builds"><meta property="og:description" content="When Jenkins scaled from 50 to 600+ builds per day, DNS resolution failures brought everything down. Here's how Linux networking knowledge saved us."><meta property="og:image" content="https://www.jenkins.io/images/logos/jenkins/jenkins.png"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://tal-naeh.github.io/blog/jenkins-dns-bottleneck/"><meta property="twitter:title" content="How DNS Resolution Became Our CI/CD Bottleneck at 600+ Daily Builds"><meta property="twitter:description" content="When Jenkins scaled from 50 to 600+ builds per day, DNS resolution failures brought everything down. Here's how Linux networking knowledge saved us."><meta property="twitter:image" content="https://www.jenkins.io/images/logos/jenkins/jenkins.png"><style>:root{--accent: #2337ff;--accent-dark: #000d8a;--black: 15, 18, 25;--gray: 96, 115, 159;--gray-light: 229, 233, 240;--gray-dark: 34, 41, 57;--gray-gradient: rgba(var(--gray-light), 50%), #fff;--box-shadow: 0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%), 0 16px 32px rgba(var(--gray), 33%)}@font-face{font-family:Atkinson;src:url(/fonts/atkinson-regular.woff) format("woff");font-weight:400;font-style:normal;font-display:swap}@font-face{font-family:Atkinson;src:url(/fonts/atkinson-bold.woff) format("woff");font-weight:700;font-style:normal;font-display:swap}body{font-family:Atkinson,sans-serif;margin:0;padding:0;text-align:left;background:linear-gradient(var(--gray-gradient)) no-repeat;background-size:100% 600px;word-wrap:break-word;overflow-wrap:break-word;color:rgb(var(--gray-dark));font-size:20px;line-height:1.7}main{width:720px;max-width:calc(100% - 2em);margin:auto;padding:3em 1em}h1,h2,h3,h4,h5,h6{margin:0 0 .5rem;color:rgb(var(--black));line-height:1.2}h1{font-size:3.052em}h2{font-size:2.441em}h3{font-size:1.953em}h4{font-size:1.563em}h5{font-size:1.25em}strong,b{font-weight:700}a,a:hover{color:var(--accent)}p{margin-bottom:1em}.prose p{margin-bottom:2em}textarea{width:100%;font-size:16px}input{font-size:16px}table{width:100%}img{max-width:100%;height:auto;border-radius:8px}code{padding:2px 5px;background-color:rgb(var(--gray-light));border-radius:2px}pre{padding:1.5em;border-radius:8px}pre>code{all:unset}blockquote{border-left:4px solid var(--accent);padding:0 0 0 20px;margin:0;font-size:1.333em}hr{border:none;border-top:1px solid rgb(var(--gray-light))}@media (max-width: 720px){body{font-size:18px}main{padding:1em}}.sr-only{border:0;padding:0;margin:0;position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px 1px 1px 1px);clip:rect(1px,1px,1px,1px);clip-path:inset(50%);white-space:nowrap}a[data-astro-cid-eimmu3lg]{display:inline-block;text-decoration:none}a[data-astro-cid-eimmu3lg].active{font-weight:bolder;text-decoration:underline}header[data-astro-cid-3ef6ksr2]{margin:0;padding:0 1em;background:#fff;box-shadow:0 2px 8px rgba(var(--black),5%)}h2[data-astro-cid-3ef6ksr2]{margin:0;font-size:1em}h2[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2],h2[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2].active{text-decoration:none}nav[data-astro-cid-3ef6ksr2]{display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap}nav[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2]{padding:1em .5em;color:var(--black);border-bottom:4px solid transparent;text-decoration:none}nav[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2].active{text-decoration:none;border-bottom-color:var(--accent)}.social-links[data-astro-cid-3ef6ksr2],.social-links[data-astro-cid-3ef6ksr2] a[data-astro-cid-3ef6ksr2]{display:flex}@media (max-width: 720px){.social-links[data-astro-cid-3ef6ksr2]{display:none}}footer[data-astro-cid-sz7xmlte]{padding:2em 1em 6em;background:linear-gradient(var(--gray-gradient)) no-repeat;color:rgb(var(--gray));text-align:center}.social-links[data-astro-cid-sz7xmlte]{display:flex;justify-content:center;gap:1em;margin-top:1em}.social-links[data-astro-cid-sz7xmlte] a[data-astro-cid-sz7xmlte]{text-decoration:none;color:rgb(var(--gray))}.social-links[data-astro-cid-sz7xmlte] a[data-astro-cid-sz7xmlte]:hover{color:rgb(var(--gray-dark))}
+main[data-astro-cid-bvzihdzo]{width:calc(100% - 2em);max-width:100%;margin:0}.hero-image[data-astro-cid-bvzihdzo]{width:100%}.hero-image[data-astro-cid-bvzihdzo] img[data-astro-cid-bvzihdzo]{display:block;margin:0 auto;border-radius:12px;box-shadow:var(--box-shadow)}.prose[data-astro-cid-bvzihdzo]{width:720px;max-width:calc(100% - 2em);margin:auto;padding:1em;color:rgb(var(--gray-dark))}.title[data-astro-cid-bvzihdzo]{margin-bottom:1em;padding:1em 0;text-align:center;line-height:1}.title[data-astro-cid-bvzihdzo] h1[data-astro-cid-bvzihdzo]{margin:0 0 .5em}.date[data-astro-cid-bvzihdzo]{margin-bottom:.5em;color:rgb(var(--gray))}.last-updated-on[data-astro-cid-bvzihdzo]{font-style:italic}
+</style></head> <body data-astro-cid-bvzihdzo> <header data-astro-cid-3ef6ksr2> <nav data-astro-cid-3ef6ksr2> <h2 data-astro-cid-3ef6ksr2><a href="/" data-astro-cid-3ef6ksr2>DevOps Out Loud</a></h2> <div class="internal-links" data-astro-cid-3ef6ksr2> <a href="/" data-astro-cid-3ef6ksr2="true" data-astro-cid-eimmu3lg> Home </a>  <a href="/blog" class="active" data-astro-cid-3ef6ksr2="true" data-astro-cid-eimmu3lg> Blog </a>  <a href="/about" data-astro-cid-3ef6ksr2="true" data-astro-cid-eimmu3lg> About </a>  </div> <div class="social-links" data-astro-cid-3ef6ksr2> <a href="https://linkedin.com/in/tal-naeh" target="_blank" data-astro-cid-3ef6ksr2> <span class="sr-only" data-astro-cid-3ef6ksr2>Follow on LinkedIn</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-3ef6ksr2><path fill="currentColor" d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z" data-astro-cid-3ef6ksr2></path></svg> </a> <a href="https://github.com/Tal-Naeh" target="_blank" data-astro-cid-3ef6ksr2> <span class="sr-only" data-astro-cid-3ef6ksr2>Visit my GitHub</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" data-astro-cid-3ef6ksr2><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-3ef6ksr2></path></svg> </a> </div> </nav> </header>  <main data-astro-cid-bvzihdzo> <article data-astro-cid-bvzihdzo> <div class="hero-image" data-astro-cid-bvzihdzo> <img src="https://www.jenkins.io/images/logos/jenkins/jenkins.png" alt="How DNS Resolution Became Our CI/CD Bottleneck at 600+ Daily Builds" style="max-width: 400px; height: auto;" data-astro-cid-bvzihdzo> </div> <div class="prose" data-astro-cid-bvzihdzo> <div class="title" data-astro-cid-bvzihdzo> <div class="date" data-astro-cid-bvzihdzo> <time datetime="2025-12-09T00:00:00.000Z"> Dec 9, 2025 </time> <div class="last-updated-on" data-astro-cid-bvzihdzo>
+Last updated on <time datetime="2025-12-09T00:00:00.000Z"> Dec 9, 2025 </time> </div> </div> <h1 data-astro-cid-bvzihdzo>How DNS Resolution Became Our CI/CD Bottleneck at 600+ Daily Builds</h1> <hr data-astro-cid-bvzihdzo> </div>
+
+<p><strong>When our development team scaled from 10 to 40 engineers, our Jenkins pipeline went from 50 builds per day to over 600. Everything seemed fine—until it wasn't. Builds started failing randomly with network timeouts. The culprit? DNS resolution. Here's how understanding Linux networking fundamentals saved our CI/CD pipeline.</strong></p>
+
+<p>This is the story of how rapid growth exposed a bottleneck we never saw coming, and why knowing your Linux networking stack matters more than you think.</p>
+
+<h2 id="the-growth-trajectory">The Growth Trajectory</h2>
+
+<p>Six months ago, our development team was lean. 10 engineers, a handful of microservices, maybe 50 builds on a busy day. Our Jenkins setup was straightforward:</p>
+
+<ul>
+<li>3 executor nodes with 4 executors each (12 total concurrent builds)</li>
+<li>Builds pulling from GitHub, DockerHub, and internal artifact repositories</li>
+<li>Average build time: 8-12 minutes</li>
+<li>Everything worked smoothly</li>
+</ul>
+
+<p>Then we raised funding. The team doubled. Then doubled again.</p>
+
+<pre><code>Month 1:  10 engineers → ~50 builds/day
+Month 3:  20 engineers → ~150 builds/day
+Month 6:  40 engineers → 600+ builds/day
+
+Jenkins scaling:
+Month 1:  3 nodes, 12 executors
+Month 6:  8 nodes, 32 executors</code></pre>
+
+<p>We added more Jenkins executors. We upgraded our infrastructure. We optimized our pipelines. On paper, we had the capacity.</p>
+
+<p>But the builds started failing.</p>
+
+<h2 id="the-symptoms">The Symptoms</h2>
+
+<p>At first, it was sporadic. A build would fail with a network timeout. Retry it, and it worked. "Transient network issue," we thought. Move on.</p>
+
+<p>Then it got worse.</p>
+
+<h3 id="the-error-messages">The Error Messages</h3>
+
+<pre><code>Error cloning repository: Could not resolve host: github.com
+Timeout while connecting to registry.hub.docker.com
+Failed to fetch package: Temporary failure in name resolution
+curl: (6) Could not resolve host: api.internal.company.com</code></pre>
+
+<p>All DNS-related. All intermittent. All concentrated during peak build times (9am-11am, 2pm-4pm).</p>
+
+<h3 id="the-pattern">The Pattern</h3>
+
+<p>We started tracking failures:</p>
+
+<pre><code>Time Range       Builds    Failures    Failure Rate
+08:00 - 09:00      45         2           4.4%
+09:00 - 10:00     120        18          15.0%
+10:00 - 11:00     145        27          18.6%
+11:00 - 12:00      95         8           8.4%
+12:00 - 13:00      50         1           2.0%
+13:00 - 14:00      65         3           4.6%
+14:00 - 15:00     135        22          16.3%
+15:00 - 16:00     140        25          17.9%</code></pre>
+
+<p>Clear correlation: more concurrent builds = more failures. All DNS-related.</p>
+
+<h2 id="the-investigation">The Investigation</h2>
+
+<p>Standard debugging didn't reveal much. Network connectivity was fine. DNS servers were healthy. Queries from individual nodes worked perfectly.</p>
+
+<p>But then we started digging into the actual query volume.</p>
+
+<h3 id="dns-query-explosion">DNS Query Explosion</h3>
+
+<p>Each build was making dozens of DNS queries:</p>
+
+<ul>
+<li>Cloning from GitHub: <code>github.com</code></li>
+<li>Pulling Docker images: <code>registry.hub.docker.com</code>, <code>auth.docker.io</code>, <code>production.cloudflare.docker.com</code></li>
+<li>Downloading dependencies: <code>npmjs.org</code>, <code>pypi.org</code>, <code>maven.org</code>, etc.</li>
+<li>Internal services: <code>api.internal.company.com</code>, <code>artifacts.internal.company.com</code></li>
+<li>External APIs: various third-party endpoints</li>
+</ul>
+
+<p>Conservatively: 20-30 unique DNS queries per build.</p>
+
+<p>Do the math:</p>
+
+<pre><code>Peak concurrent builds: 32 (all executors running)
+DNS queries per build: ~25
+Query frequency: every few seconds during active build phases
+
+Peak load: 32 builds × 25 domains = 800+ DNS queries
+Duration: sustained for 8-12 minutes per build wave</code></pre>
+
+<p>We were hammering our DNS infrastructure with thousands of queries per minute.</p>
+
+<h3 id="checking-the-dns-setup">Checking the DNS Setup</h3>
+
+<p>On our Jenkins executors, the DNS configuration was default Ubuntu:</p>
+
+<pre><code>$ cat /etc/resolv.conf
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+options timeout:2 attempts:3</code></pre>
+
+<p>Every DNS query was going out to Google's public DNS. No caching. No local resolver.</p>
+
+<p>With 2-second timeouts and high query volume, we were hitting timeout limits under load. Queries were queuing, timing out, and causing build failures.</p>
+
+<h2 id="understanding-dns-resolution-in-linux">Understanding DNS Resolution in Linux</h2>
+
+<p>This is where Linux networking fundamentals became critical. To solve the problem, we needed to understand how DNS resolution actually works.</p>
+
+<h3 id="the-dns-resolution-chain">The DNS Resolution Chain</h3>
+
+<p>When an application makes a DNS query on Linux, here's what happens:</p>
+
+<pre><code>Application (curl, git, docker)
+    ↓
+glibc resolver (getaddrinfo)
+    ↓
+/etc/nsswitch.conf (determines resolution order)
+    ↓
+/etc/hosts (checked first if configured)
+    ↓
+DNS resolver (from /etc/resolv.conf)
+    ↓
+systemd-resolved OR traditional resolv.conf
+    ↓
+Upstream DNS servers (8.8.8.8, etc.)</code></pre>
+
+<p>By default, there's no caching at the OS level. Every query goes all the way to the upstream DNS server.</p>
+
+<h3 id="the-resolv-conf-file">The /etc/resolv.conf File</h3>
+
+<p>This file controls DNS behavior:</p>
+
+<pre><code>nameserver 8.8.8.8      # Primary DNS server
+nameserver 8.8.4.4      # Fallback DNS server
+options timeout:2       # Timeout per query (seconds)
+options attempts:3      # Number of retry attempts
+options rotate          # Rotate through nameservers
+options ndots:1         # Dots required for absolute lookup</code></pre>
+
+<p>Key insight: <code>timeout:2</code> with <code>attempts:3</code> means a failed query takes 6 seconds minimum before giving up. Under load, these timeouts stack up.</p>
+
+<h3 id="systemd-resolved">systemd-resolved</h3>
+
+<p>Modern Ubuntu uses systemd-resolved, which provides some caching:</p>
+
+<pre><code>$ systemctl status systemd-resolved
+● systemd-resolved.service - Network Name Resolution
+   Active: active (running)</code></pre>
+
+<p>But the default cache is limited:</p>
+
+<pre><code>$ resolvectl statistics
+Current Cache Size: 0
+Cache Hits: 127
+Cache Misses: 1843</code></pre>
+
+<p>Cache hit rate: about 6%. Not nearly enough for our use case.</p>
+
+<h3 id="why-no-caching">Why No Caching?</h3>
+
+<p>The problem: most CI/CD workloads are short-lived. Jenkins executors start build jobs that run for minutes, then stop. The OS-level DNS cache (even with systemd-resolved) doesn't help much because:</p>
+
+<ol>
+<li>Each build is a fresh process with no cache</li>
+<li>systemd-resolved's cache is limited (short TTLs)</li>
+<li>High concurrency means the cache keeps getting wiped</li>
+</ol>
+
+<p>We needed a dedicated DNS caching layer.</p>
+
+<h2 id="the-solution-dns-caching">The Solution: DNS Caching</h2>
+
+<p>We implemented a local DNS cache on each Jenkins executor using <code>dnsmasq</code>.</p>
+
+<h3 id="why-dnsmasq">Why dnsmasq?</h3>
+
+<ul>
+<li>Lightweight (minimal resource overhead)</li>
+<li>Simple configuration</li>
+<li>Aggressive caching (respects TTLs but caches effectively)</li>
+<li>Battle-tested (used in countless production environments)</li>
+</ul>
+
+<h3 id="implementation">Implementation</h3>
+
+<p><strong>Step 1: Install dnsmasq</strong></p>
+
+<pre><code>sudo apt-get update
+sudo apt-get install -y dnsmasq</code></pre>
+
+<p><strong>Step 2: Configure dnsmasq</strong></p>
+
+<p>Edit <code>/etc/dnsmasq.conf</code>:</p>
+
+<pre><code># Don't read /etc/resolv.conf for upstream servers
+no-resolv
+
+# Define upstream DNS servers explicitly
+server=8.8.8.8
+server=8.8.4.4
+server=1.1.1.1
+
+# Cache size (default is 150, we increased it)
+cache-size=10000
+
+# Don't forward queries for plain names (security)
+domain-needed
+
+# Don't forward reverse lookups for private IP ranges
+bogus-priv
+
+# Listen on localhost only
+listen-address=127.0.0.1
+
+# Log queries (for debugging, disable in production)
+# log-queries</code></pre>
+
+<p><strong>Step 3: Update /etc/resolv.conf</strong></p>
+
+<p>Point the system resolver to localhost:</p>
+
+<pre><code># Make resolv.conf immutable to prevent systemd-resolved from changing it
+sudo chattr -i /etc/resolv.conf
+
+# Update resolv.conf
+sudo tee /etc/resolv.conf > /dev/null <<EOF
+nameserver 127.0.0.1
+options timeout:1
+EOF
+
+# Make it immutable
+sudo chattr +i /etc/resolv.conf</code></pre>
+
+<p><strong>Step 4: Disable systemd-resolved (it conflicts)</strong></p>
+
+<pre><code>sudo systemctl disable systemd-resolved
+sudo systemctl stop systemd-resolved</code></pre>
+
+<p><strong>Step 5: Start dnsmasq</strong></p>
+
+<pre><code>sudo systemctl enable dnsmasq
+sudo systemctl start dnsmasq
+sudo systemctl status dnsmasq</code></pre>
+
+<h3 id="verification">Verification</h3>
+
+<p>Test DNS resolution:</p>
+
+<pre><code>$ dig github.com @127.0.0.1
+
+;; Query time: 45 msec  (first query - cache miss)
+
+$ dig github.com @127.0.0.1
+
+;; Query time: 0 msec   (cached!)</code></pre>
+
+<p>Check dnsmasq cache stats:</p>
+
+<pre><code>sudo kill -USR1 $(pidof dnsmasq)
+sudo tail -20 /var/log/syslog
+
+# Output shows:
+# cache size 10000, 0/847 cache insertions re-used unexpired cache entries
+# queries forwarded 1243, queries answered locally 8621</code></pre>
+
+<p>Cache hit rate after deployment: 87%.</p>
+
+<h2 id="the-results">The Results</h2>
+
+<p>The impact was immediate and dramatic.</p>
+
+<h3 id="before-vs-after">Before vs After</h3>
+
+<pre><code>Metric                          Before      After       Improvement
+-----------------------------------------------------------------
+DNS query latency (avg)         45ms        0.5ms       90x faster
+DNS timeouts per day            180         3           98% reduction
+Build failure rate (peak)       18%         0.8%        95% reduction
+Average build time              11.2min     9.8min      12% faster
+Jenkins executor CPU (DNS)      8%          0.2%        40x less</code></pre>
+
+<h3 id="the-unexpected-benefits">The Unexpected Benefits</h3>
+
+<p>Beyond fixing the failures, we got surprising improvements:</p>
+
+<ol>
+<li><strong>Faster builds</strong>: Eliminating DNS latency shaved 1-2 minutes off average build times</li>
+<li><strong>Less network load</strong>: 87% cache hit rate meant 87% fewer outbound DNS queries</li>
+<li><strong>More predictable performance</strong>: No more variance from DNS lookup times</li>
+<li><strong>Better debugging</strong>: dnsmasq logs made DNS issues immediately visible</li>
+</ol>
+
+<h2 id="monitoring-dns-in-production">Monitoring DNS in Production</h2>
+
+<p>After deployment, we added DNS monitoring to our observability stack.</p>
+
+<h3 id="key-metrics">Key Metrics</h3>
+
+<p>We track:</p>
+
+<pre><code># Cache hit rate
+(queries_answered_locally / total_queries) * 100
+
+# Query latency percentiles
+p50, p95, p99 query times
+
+# Timeout rate
+dns_timeouts / total_queries
+
+# Cache size utilization
+current_cache_entries / max_cache_size</code></pre>
+
+<h3 id="alerting">Alerting</h3>
+
+<p>We alert on:</p>
+
+<ul>
+<li>Cache hit rate drops below 70%</li>
+<li>DNS timeout rate exceeds 1%</li>
+<li>Average query latency exceeds 10ms</li>
+<li>dnsmasq service is down</li>
+</ul>
+
+<h3 id="dashboard">Dashboard</h3>
+
+<p>We built a Grafana dashboard showing:</p>
+
+<pre><code>┌─────────────────────────────────────────────┐
+│ DNS Performance - Jenkins Executors         │
+├─────────────────────────────────────────────┤
+│                                             │
+│  Cache Hit Rate:        87.3%  ✓           │
+│  Avg Query Time:        0.6ms  ✓           │
+│  Timeout Rate:          0.04%  ✓           │
+│  Queries/min:           1,240              │
+│                                             │
+│  [Graph: Query latency over time]          │
+│  [Graph: Cache hit rate over time]         │
+│  [Graph: Timeout rate correlation]         │
+│                                             │
+└─────────────────────────────────────────────┘</code></pre>
+
+<h2 id="what-we-learned">What We Learned</h2>
+
+<h3 id="linux-networking-fundamentals-matter">Linux Networking Fundamentals Matter</h3>
+
+<p>You can't debug what you don't understand. Knowing how DNS resolution works in Linux—the resolver chain, /etc/resolv.conf, systemd-resolved, timeout behavior—was essential to solving this problem.</p>
+
+<p>This isn't esoteric knowledge. This is fundamental DevOps infrastructure understanding.</p>
+
+<h3 id="monitoring-has-blind-spots">Monitoring Has Blind Spots</h3>
+
+<p>Our monitoring showed:</p>
+<ul>
+<li>Network: healthy ✓</li>
+<li>DNS servers: healthy ✓</li>
+<li>Individual queries: working ✓</li>
+</ul>
+
+<p>But it missed the big picture: thousands of DNS queries per minute overwhelming our DNS servers.</p>
+
+<p>We added DNS-specific metrics after this. Volume matters, not just success rate.</p>
+
+<h3 id="it-works-on-my-machine-doesnt-scale">"It Works On My Machine" Doesn't Scale</h3>
+
+<p>A single build making 25 DNS queries? No problem.</p>
+
+<p>32 concurrent builds making 800 combined queries sustained over minutes? Problem.</p>
+
+<p>Infrastructure that works at low scale can break in completely different ways at high scale. DNS resolution is a perfect example.</p>
+
+<h3 id="caching-is-infrastructure">Caching Is Infrastructure</h3>
+
+<p>We think of caching for application data—Redis, Memcached, CDNs. But caching applies to infrastructure too:</p>
+
+<ul>
+<li>DNS caching (dnsmasq, nscd)</li>
+<li>Package caching (apt-cacher-ng, Docker registry cache)</li>
+<li>Artifact caching (local Nexus/Artifactory)</li>
+</ul>
+
+<p>Every external dependency can become a bottleneck. Caching turns repeated network calls into local lookups.</p>
+
+<h3 id="growth-exposes-assumptions">Growth Exposes Assumptions</h3>
+
+<p>At 50 builds/day, we never thought about DNS. It just worked.</p>
+
+<p>At 600 builds/day, our implicit assumption—"DNS resolution is fast and reliable"—was wrong.</p>
+
+<p>Infrastructure that works at one scale often breaks at another. Planning ahead means questioning your assumptions before growth forces you to.</p>
+
+<h2 id="broader-implications">Broader Implications</h2>
+
+<h3 id="communication-and-networking-are-core-skills">Communication and Networking Are Core Skills</h3>
+
+<p>Understanding DNS isn't optional for DevOps engineers. Neither is understanding:</p>
+
+<ul>
+<li>TCP/IP fundamentals (connection limits, TIME_WAIT, etc.)</li>
+<li>HTTP/HTTPS behavior (keep-alive, connection pooling)</li>
+<li>Load balancing (L4 vs L7, connection distribution)</li>
+<li>Network timeouts (connect, read, total)</li>
+</ul>
+
+<p>These aren't "networking team" problems. These are DevOps problems. Your applications run on networks. Your CI/CD runs on networks. Your infrastructure runs on networks.</p>
+
+<p>Know your stack, all the way down.</p>
+
+<h3 id="planning-ahead-vs-reacting">Planning Ahead vs Reacting</h3>
+
+<p>We only reacted to problems. We added executors when builds queued. We added resources when systems slowed.</p>
+
+<p>But we didn't plan ahead and ask: "What happens at 10x our current scale?"</p>
+
+<p>Planning ahead means asking:</p>
+
+<ul>
+<li>What are our current bottlenecks?</li>
+<li>What will become bottlenecks at 5x scale? 10x?</li>
+<li>What assumptions break under load?</li>
+<li>Where is our infrastructure making repeated external calls?</li>
+</ul>
+
+<p>DNS was obvious in hindsight. It should have been obvious in foresight.</p>
+
+<h3 id="documentation-and-knowledge-sharing">Documentation and Knowledge Sharing</h3>
+
+<p>After fixing this, we documented:</p>
+
+<ol>
+<li>How DNS resolution works in our infrastructure</li>
+<li>Why we use dnsmasq</li>
+<li>How to debug DNS issues</li>
+<li>What metrics to monitor</li>
+<li>When to scale or reconfigure</li>
+</ol>
+
+<p>Infrastructure knowledge can't live in one person's head. The next engineer debugging a DNS issue shouldn't have to rediscover all of this.</p>
+
+<h2 id="implementation-checklist">Implementation Checklist</h2>
+
+<p>If you're running CI/CD at scale, here's what to check:</p>
+
+<p><strong>1. Measure your DNS query volume</strong></p>
+
+<pre><code># On your CI/CD nodes, monitor DNS traffic
+sudo tcpdump -i any port 53 -c 100
+
+# Count queries over time
+watch -n 5 'sudo ss -u | grep :53 | wc -l'</code></pre>
+
+<p><strong>2. Check your DNS configuration</strong></p>
+
+<pre><code>cat /etc/resolv.conf
+systemctl status systemd-resolved
+dig +trace example.com  # Verify resolution path</code></pre>
+
+<p><strong>3. Test DNS under load</strong></p>
+
+<pre><code># Simple load test
+for i in {1..1000}; do dig github.com > /dev/null & done
+wait
+
+# Monitor for failures or slowdowns</code></pre>
+
+<p><strong>4. Implement DNS caching if needed</strong></p>
+
+<ul>
+<li>Install dnsmasq (or alternatives like nscd, unbound)</li>
+<li>Configure appropriate cache size for your workload</li>
+<li>Point /etc/resolv.conf to localhost</li>
+<li>Monitor cache hit rates</li>
+</ul>
+
+<p><strong>5. Add DNS monitoring</strong></p>
+
+<ul>
+<li>Query latency (p50, p95, p99)</li>
+<li>Cache hit rate</li>
+<li>Timeout rate</li>
+<li>Query volume over time</li>
+</ul>
+
+<p><strong>6. Document your setup</strong></p>
+
+<ul>
+<li>How DNS resolution works in your environment</li>
+<li>Why you configured it this way</li>
+<li>How to debug DNS issues</li>
+<li>When to scale or reconfigure</li>
+</ul>
+
+<h2 id="alternatives-to-dnsmasq">Alternatives to dnsmasq</h2>
+
+<p>We chose dnsmasq, but other options exist:</p>
+
+<p><strong>nscd (Name Service Cache Daemon)</strong></p>
+<ul>
+<li>Pros: Built into most Linux distros, minimal setup</li>
+<li>Cons: Less configurable, can have bugs, less visibility</li>
+</ul>
+
+<p><strong>systemd-resolved (with tuning)</strong></p>
+<ul>
+<li>Pros: Already present on modern Ubuntu, integrated</li>
+<li>Cons: Conservative caching, less control, complex configuration</li>
+</ul>
+
+<p><strong>unbound</strong></p>
+<ul>
+<li>Pros: Very powerful, DNSSEC support, recursive resolver</li>
+<li>Cons: More complex, heavier weight, overkill for simple caching</li>
+</ul>
+
+<p><strong>CoreDNS</strong></p>
+<ul>
+<li>Pros: Cloud-native, plugin ecosystem, Kubernetes-friendly</li>
+<li>Cons: Requires Go, more resources, configuration complexity</li>
+</ul>
+
+<p>For CI/CD caching, dnsmasq hits the sweet spot: simple, effective, lightweight.</p>
+
+<h2 id="the-tldr">The TL;DR</h2>
+
+<ul>
+<li>Rapid development growth (10 → 40 engineers) scaled our Jenkins builds from 50 to 600+ per day</li>
+<li>High concurrent build volume exposed a DNS resolution bottleneck</li>
+<li>Thousands of DNS queries per minute overwhelmed our upstream DNS resolution</li>
+<li>Default Linux DNS configuration has no good caching for short-lived jobs</li>
+<li>Implementing dnsmasq for local DNS caching reduced query latency by 90x and build failures by 98%</li>
+<li>Understanding Linux networking fundamentals (resolv.conf, systemd-resolved, DNS resolution chain) was critical to solving the problem</li>
+<li>DNS monitoring and planning ahead prevent these issues before they cause failures</li>
+<li>Infrastructure assumptions that work at low scale often break at high scale</li>
+</ul>
+
+<h2 id="the-deeper-lesson">The Deeper Lesson</h2>
+
+<p>This story isn't really about DNS. It's about understanding the systems you build on.</p>
+
+<p>Modern DevOps has many layers: Jenkins, Docker, Kubernetes, cloud platforms. It's easy to treat everything below your application as "infrastructure that just works."</p>
+
+<p>But when things break—and at scale, they will—you need to understand how those layers actually work. Not just the tools, but the underlying systems.</p>
+
+<p><strong>DNS resolution. TCP connections. File systems. Process scheduling. Memory management.</strong></p>
+
+<p>These aren't "sysadmin" topics that DevOps has moved beyond. These are the fundamentals that everything else is built on.</p>
+
+<p>When your Jenkins builds are failing and nobody can figure out why, knowing how <code>/etc/resolv.conf</code> works isn't optional knowledge. It's the difference between guessing and understanding.</p>
+
+<p>The DevOps engineers who do well aren't the ones who know the most tools. They're the ones who understand their systems all the way down—and know when to dig deeper.</p>
+
+<hr>
+
+<div style="text-align: center; margin: 2em 0;">
+<img src="https://i.imgur.com/qKf0feh.png" alt="It's not DNS. There's no way it's DNS. It was DNS." style="max-width: 600px; width: 100%; height: auto;">
+</div>
+
+ </div> </article> </main> <footer data-astro-cid-sz7xmlte>
+&copy; 2025 Tal Naeh. All rights reserved.
+<div class="social-links" data-astro-cid-sz7xmlte> <a href="https://linkedin.com/in/tal-naeh" target="_blank" data-astro-cid-sz7xmlte> <span class="sr-only" data-astro-cid-sz7xmlte>Follow on LinkedIn</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/twitter" data-astro-cid-sz7xmlte><path fill="currentColor" d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z" data-astro-cid-sz7xmlte></path></svg> </a> <a href="https://github.com/Tal-Naeh" target="_blank" data-astro-cid-sz7xmlte> <span class="sr-only" data-astro-cid-sz7xmlte>Visit my GitHub</span> <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/github" data-astro-cid-sz7xmlte><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-sz7xmlte></path></svg> </a> </div> </footer>  </body></html>
